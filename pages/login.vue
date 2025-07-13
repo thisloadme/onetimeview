@@ -72,7 +72,8 @@
 
 <script setup>
 definePageMeta({
-  layout: false
+  layout: false,
+  middleware: 'guest'
 })
 
 const form = reactive({
@@ -82,6 +83,8 @@ const form = reactive({
 
 const loading = ref(false)
 const error = ref('')
+
+const route = useRoute()
 
 const handleLogin = async () => {
   loading.value = true
@@ -93,7 +96,9 @@ const handleLogin = async () => {
       body: form
     })
 
-    await navigateTo('/dashboard')
+    // Redirect to original URL or dashboard
+    const redirectUrl = route.query.redirect || '/dashboard'
+    await navigateTo(redirectUrl)
   } catch (err) {
     error.value = err.data?.message || 'Login failed'
   } finally {

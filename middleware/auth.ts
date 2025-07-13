@@ -4,6 +4,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   try {
     await $fetch('/api/auth/me')
   } catch (error) {
-    return navigateTo('/login')
+    // Redirect to login with return URL
+    return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
   }
 })
