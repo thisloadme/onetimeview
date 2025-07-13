@@ -19,5 +19,3 @@ useHead({
   ]
 })
 </script>
-</NuxtPage>
-</template>

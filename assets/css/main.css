@@ -46,7 +46,7 @@
   }
   
   .prose-dark {
-    @apply prose prose-invert max-w-none;
+    @apply prose prose-invert prose-gray max-w-none;
   }
   
   .prose-dark h1 { @apply text-2xl font-bold text-gray-100 mb-4 mt-6; }
