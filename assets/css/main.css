@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 border border-gray-700 hover:border-gray-600;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200;
+  }
+  
+  .card {
+    @apply bg-gray-800 rounded-xl shadow-xl border border-gray-700 p-6 transition-all duration-200 hover:shadow-2xl hover:border-gray-600;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-100 placeholder-gray-400;
+  }
+  
+  .nav-bg {
+    @apply bg-gray-900/95 backdrop-blur-md border-gray-800;
+  }
+  
+  .hero-gradient {
+    @apply bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent;
+  }
+  
+  .prose-dark {
+    @apply prose prose-invert max-w-none;
+  }
+  
+  .prose-dark h1 { @apply text-2xl font-bold text-gray-100 mb-4 mt-6; }
+  .prose-dark h2 { @apply text-xl font-bold text-gray-100 mb-3 mt-5; }
+  .prose-dark h3 { @apply text-lg font-bold text-gray-100 mb-2 mt-4; }
+  .prose-dark p { @apply text-gray-300 mb-4 leading-relaxed; }
+  .prose-dark ul { @apply list-disc list-inside mb-4 text-gray-300; }
+  .prose-dark ol { @apply list-decimal list-inside mb-4 text-gray-300; }
+  .prose-dark li { @apply mb-1; }
+  .prose-dark a { @apply text-blue-400 hover:text-blue-300 underline; }
+  .prose-dark strong { @apply font-bold text-gray-100; }
+  .prose-dark em { @apply italic; }
+  .prose-dark code { @apply bg-gray-800 px-2 py-1 rounded font-mono text-sm text-blue-300; }
+  .prose-dark pre { @apply bg-gray-800 p-4 rounded-lg overflow-x-auto mb-4 border border-gray-700; }
+  .prose-dark blockquote { @apply border-l-4 border-blue-500 pl-4 italic text-gray-400 mb-4; }
+}
