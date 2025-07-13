@@ -20,7 +20,7 @@
       </div>
     </nav>
 
-    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-16">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
@@ -40,54 +40,8 @@
       </div>
 
       <!-- Edit Form -->
-      <div v-else class="card overflow-hidden">
-        <!-- Title Input -->
-        <div class="p-6 border-b border-gray-700">
-          <input
-            v-model="document.title"
-            type="text"
-            placeholder="Document title..."
-            class="w-full text-2xl font-bold text-gray-100 bg-transparent border-none outline-none resize-none placeholder-gray-500"
-          />
-        </div>
-
-        <!-- Editor and Preview -->
-        <div class="grid md:grid-cols-2 min-h-96">
-          <!-- Editor -->
-          <div class="border-r border-gray-700">
-            <div class="p-4 bg-gray-900 border-b border-gray-700">
-              <h3 class="font-medium text-gray-100">Editor</h3>
-            </div>
-            <textarea
-              v-model="document.content"
-              placeholder="Start writing your markdown content here...
-
-# Heading 1
-## Heading 2
-
-**Bold text** and *italic text*
-
-- List item 1
-- List item 2
-
-[Link text](https://example.com)
-
-```javascript
-// Code block
-console.log('Hello World!');
-```"
-              class="w-full h-96 p-6 bg-gray-800 border-none outline-none resize-none font-mono text-sm leading-relaxed text-gray-200 placeholder-gray-500"
-            ></textarea>
-          </div>
-
-          <!-- Preview -->
-          <div>
-            <div class="p-4 bg-gray-900 border-b border-gray-700">
-              <h3 class="font-medium text-gray-100">Preview</h3>
-            </div>
-            <div class="p-6 h-96 overflow-y-auto prose-dark" v-html="renderedMarkdown"></div>
-          </div>
-        </div>
+      <div v-else>
+        <MarkdownEditor v-model="document" />
       </div>
 
       <!-- Success Message -->
@@ -104,8 +58,6 @@ console.log('Hello World!');
 </template>
 
 <script setup>
-import { marked } from 'marked'
-
 definePageMeta({
   middleware: 'auth'
 })
@@ -122,11 +74,6 @@ const loading = ref(true)
 const saving = ref(false)
 const saved = ref(false)
 const error = ref('')
-
-const renderedMarkdown = computed(() => {
-  if (!document.content) return '<p class="text-gray-500">Preview will appear here...</p>'
-  return marked(document.content)
-})
 
 // Load document data
 onMounted(async () => {
