@@ -1,5 +1,6 @@
 import { SharedLink } from '~/server/models/SharedLink'
 import { Document } from '~/server/models/Document'
+import { DocumentAccess } from '~/server/models/DocumentAccess'
 
 export default defineEventHandler(async (event) => {
   const token = getRouterParam(event, 'token')
@@ -36,6 +37,18 @@ export default defineEventHandler(async (event) => {
   }
   
   await sharedLink.save()
+  
+  // Record the access
+  const clientIP = getRequestIP(event) || 'unknown'
+  const userAgent = getHeader(event, 'user-agent') || 'unknown'
+  
+  await DocumentAccess.create({
+    document: sharedLink.document._id,
+    sharedLink: sharedLink._id,
+    ipAddress: clientIP,
+    userAgent: userAgent,
+    accessType: 'shared_link'
+  })
   
   return {
     document: sharedLink.document,
