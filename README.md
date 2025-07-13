@@ -4,8 +4,6 @@
 
 OneTimeView is a modern, secure document sharing platform built for professionals who need to share confidential information with controlled access. Perfect for consultants, HR professionals, researchers, and developers who value security and privacy.
 
-![OneTimeView Preview](https://via.placeholder.com/800x400/1f2937/ffffff?text=OneTimeView+Preview)
-
 ## ✨ Key Features
 
 ### 🔒 **Secure by Design**
@@ -65,17 +63,6 @@ Get a unique link and share it. The document will be automatically removed after
 | 📱 **Responsive** | Works on all devices |
 | ⚡ **Fast** | Optimized for performance |
 
-## 🎨 Screenshots
-
-### Dashboard
-![Dashboard](https://via.placeholder.com/400x300/1f2937/ffffff?text=Dashboard)
-
-### Markdown Editor
-![Editor](https://via.placeholder.com/400x300/1f2937/ffffff?text=Markdown+Editor)
-
-### Share Modal
-![Share](https://via.placeholder.com/400x300/1f2937/ffffff?text=Share+Modal)
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -86,7 +73,7 @@ Get a unique link and share it. The document will be automatically removed after
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/onetimeview.git
+   git clone https://github.com/thisloadme/onetimeview.git
    cd onetimeview
    ```
 
@@ -157,18 +144,6 @@ onetimeview/
 └── middleware/        # Authentication middleware
 ```
 
-## 🤝 Contributing
-
-We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-### Development Guidelines
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -179,12 +154,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
 - [MongoDB](https://www.mongodb.com/) - NoSQL database
 - [Marked.js](https://marked.js.org/) - Markdown parser
-
-## 📞 Support
-
-- **Email:** support@onetimeview.com
-- **Documentation:** [docs.onetimeview.com](https://docs.onetimeview.com)
-- **Issues:** [GitHub Issues](https://github.com/yourusername/onetimeview/issues)
 
 ---
 
