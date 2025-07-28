@@ -21,7 +21,7 @@
     </nav>
 
     <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <MarkdownEditor v-model="document" />
+      <MarkdownEditor v-model="markdownDocument" />
 
       <!-- Success Message -->
       <div v-if="saved" class="mt-4 p-4 bg-green-900/20 border border-green-800 rounded-lg">
@@ -41,7 +41,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const document = reactive({
+const markdownDocument = reactive({
   title: '',
   content: ''
 })
@@ -50,7 +50,7 @@ const saving = ref(false)
 const saved = ref(false)
 
 const saveDocument = async () => {
-  if (!document.title.trim() || !document.content.trim()) {
+  if (!markdownDocument.title.trim() || !markdownDocument.content.trim()) {
     alert('Please enter both title and content')
     return
   }
@@ -59,9 +59,9 @@ const saveDocument = async () => {
   saved.value = false
 
   try {
-    const { document: createdDoc } = await $fetch('/api/documents', {
+    const { markdownDocument: createdDoc } = await $fetch('/api/documents', {
       method: 'POST',
-      body: document
+      body: markdownDocument
     })
 
     saved.value = true
