@@ -50,7 +50,7 @@ const saving = ref(false)
 const saved = ref(false)
 
 const saveDocument = async () => {
-  if (!markdownDocument.value.title.trim() || !markdownDocument.value.content.trim()) {
+  if (!markdownDocument.title.trim() || !markdownDocument.content.trim()) {
     alert('Please enter both title and content')
     return
   }
@@ -59,9 +59,9 @@ const saveDocument = async () => {
   saved.value = false
 
   try {
-    const { document: createdDoc } = await $fetch('/api/documents', {
+    const { markdownDocument: createdDoc } = await $fetch('/api/documents', {
       method: 'POST',
-      body: markdownDocument.value
+      body: markdownDocument
     })
 
     saved.value = true
