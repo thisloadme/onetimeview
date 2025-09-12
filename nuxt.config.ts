@@ -13,7 +13,11 @@ export default defineNuxtConfig({
   },
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
-    mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/onetimeview',
+    dbHost: process.env.DB_HOST || 'localhost',
+    dbPort: process.env.DB_PORT || '5432',
+    dbDatabase: process.env.DB_DATABASE || 'onetimeview',
+    dbUsername: process.env.DB_USERNAME || 'postgres',
+    dbPassword: process.env.DB_PASSWORD || '',
     jwtSecret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
     public: {
       appName: 'OneTimeView'

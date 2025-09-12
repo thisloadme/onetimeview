@@ -1,18 +1,18 @@
-import { SharedLink } from '~/server/models/SharedLink'
-import { Document } from '~/server/models/Document'
-import { DocumentAccess } from '~/server/models/DocumentAccess'
+import { SharedLinkModel } from '~/server/models/SharedLink'
+import { DocumentModel } from '~/server/models/Document'
+import { DocumentAccessModel } from '~/server/models/DocumentAccess'
 
 export default defineEventHandler(async (event) => {
   const token = getRouterParam(event, 'token')
   
-  const sharedLink = await SharedLink.findOne({ 
-    token,
-    isActive: true,
-    expiresAt: { $gt: new Date() }
-  }).populate({
-    path: 'document',
-    select: 'title content'
-  })
+  if (!token) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Token is required'
+    })
+  }
+  
+  const sharedLink = await SharedLinkModel.findActiveByToken(token)
   
   if (!sharedLink) {
     throw createError({
@@ -21,41 +21,47 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  if (sharedLink.currentAccesses >= sharedLink.maxAccesses) {
+  if (sharedLink.current_accesses >= sharedLink.max_accesses) {
     throw createError({
       statusCode: 403,
       statusMessage: 'Maximum access limit reached'
     })
   }
   
-  // Increment access count
-  sharedLink.currentAccesses += 1
+  // Get the document
+  const document = await DocumentModel.findById(sharedLink.document_id)
   
-  // Deactivate if max accesses reached
-  if (sharedLink.currentAccesses >= sharedLink.maxAccesses) {
-    sharedLink.isActive = false
+  if (!document) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Document not found'
+    })
   }
   
-  await sharedLink.save()
+  // Increment access count
+  await SharedLinkModel.incrementAccess(sharedLink.id)
   
   // Record the access
   const clientIP = getRequestIP(event) || 'unknown'
   const userAgent = getHeader(event, 'user-agent') || 'unknown'
   
-  await DocumentAccess.create({
-    document: sharedLink.document._id,
-    sharedLink: sharedLink._id,
-    ipAddress: clientIP,
-    userAgent: userAgent,
-    accessType: 'shared_link'
+  await DocumentAccessModel.create({
+    document_id: document.id,
+    shared_link_id: sharedLink.id,
+    ip_address: clientIP,
+    user_agent: userAgent,
+    access_type: 'shared_link'
   })
   
   return {
-    document: sharedLink.document,
+    document: {
+      title: document.title,
+      content: document.content
+    },
     accessInfo: {
-      currentAccesses: sharedLink.currentAccesses,
-      maxAccesses: sharedLink.maxAccesses,
-      remainingAccesses: sharedLink.maxAccesses - sharedLink.currentAccesses
+      currentAccesses: sharedLink.current_accesses + 1,
+      maxAccesses: sharedLink.max_accesses,
+      remainingAccesses: sharedLink.max_accesses - (sharedLink.current_accesses + 1)
     }
   }
 })

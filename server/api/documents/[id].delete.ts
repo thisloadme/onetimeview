@@ -1,4 +1,4 @@
-import { Document } from '~/server/models/Document'
+import { DocumentModel } from '~/server/models/Document'
 import { getCurrentUser } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -20,25 +20,15 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  const document = await Document.findById(documentId)
+  // Delete the document (this will check if user is the author)
+  const deleted = await DocumentModel.delete(parseInt(documentId))
   
-  if (!document) {
+  if (!deleted) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Document not found'
+      statusMessage: 'Document not found or you do not have permission to delete it'
     })
   }
-  
-  // Check if user is the author of the document
-  if (document.author.toString() !== user._id.toString()) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'You do not have permission to delete this document'
-    })
-  }
-  
-  // Delete the document
-  await Document.findByIdAndDelete(documentId)
   
   return { message: 'Document deleted successfully' }
-}) 
+})

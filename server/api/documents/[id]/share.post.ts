@@ -1,5 +1,5 @@
-import { Document } from '~/server/models/Document'
-import { SharedLink } from '~/server/models/SharedLink'
+import { DocumentModel } from '~/server/models/Document'
+import { SharedLinkModel } from '~/server/models/SharedLink'
 import { getCurrentUser } from '~/server/utils/auth'
 import crypto from 'crypto'
 
@@ -23,12 +23,19 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  const document = await Document.findOne({ _id: documentId, author: user._id })
+  if (!documentId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Document ID is required'
+    })
+  }
+  
+  const document = await DocumentModel.findByAuthorAndId(user.id, parseInt(documentId))
   
   if (!document) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Document not found'
+      statusMessage: 'Document not found or you do not have permission to share it'
     })
   }
   
@@ -40,15 +47,15 @@ export default defineEventHandler(async (event) => {
   expiresAt.setTime(expiresAt.getTime() + (expiresIn * 60 * 60 * 1000)) // Convert hours to milliseconds
   
   // Create shared link
-  const sharedLink = await SharedLink.create({
-    document: documentId,
+  const sharedLink = await SharedLinkModel.create({
+    document_id: parseInt(documentId),
     token,
-    maxAccesses,
-    expiresAt
+    max_accesses: maxAccesses,
+    expires_at: expiresAt
   })
   
   // Mark document as published
-  await Document.findByIdAndUpdate(documentId, { isPublished: true })
+  await DocumentModel.update(parseInt(documentId), { is_published: true })
   
   return {
     sharedLink: {

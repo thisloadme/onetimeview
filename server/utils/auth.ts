@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import type { User } from '~/server/models/User'
+import { UserModel } from '~/server/models/User'
 
 export function generateToken(userId: string) {
   const config = useRuntimeConfig()
@@ -15,7 +16,7 @@ export function verifyToken(token: string) {
   }
 }
 
-export async function getCurrentUser(event: any) {
+export async function getCurrentUser(event: any): Promise<User | null> {
   const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '')
   
   if (!token) return null
@@ -23,6 +24,16 @@ export async function getCurrentUser(event: any) {
   const decoded = verifyToken(token)
   if (!decoded) return null
   
-  const { User } = await import('~/server/models/User')
-  return await User.findById(decoded.userId).select('-password')
+  const user = await UserModel.findById(parseInt(decoded.userId))
+  if (!user) return null
+  
+  // Return user without password for security
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    created_at: user.created_at,
+    updated_at: user.updated_at,
+    password: '' // Don't expose password
+  }
 }

@@ -1,4 +1,4 @@
-import { Document } from '~/server/models/Document'
+import { DocumentModel } from '~/server/models/Document'
 import { getCurrentUser } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -11,9 +11,7 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  const documents = await Document.find({ author: user._id })
-    .sort({ updatedAt: -1 })
-    .select('title content isPublished createdAt updatedAt')
+  const documents = await DocumentModel.findByAuthor(user.id)
   
   return { documents }
 })

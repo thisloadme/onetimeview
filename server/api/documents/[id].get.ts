@@ -1,4 +1,4 @@
-import { Document } from '~/server/models/Document'
+import { DocumentModel } from '~/server/models/Document'
 import { getCurrentUser } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -20,22 +20,14 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  const document = await Document.findById(documentId)
+  const document = await DocumentModel.findByAuthorAndId(user.id, parseInt(documentId))
   
   if (!document) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Document not found'
-    })
-  }
-  
-  // Check if user is the author of the document
-  if (document.author.toString() !== user._id.toString()) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'You do not have permission to access this document'
+      statusMessage: 'Document not found or you do not have permission to access it'
     })
   }
   
   return { document }
-}) 
+})

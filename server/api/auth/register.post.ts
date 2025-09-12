@@ -1,4 +1,4 @@
-import { User } from '~/server/models/User'
+import { UserModel } from '~/server/models/User'
 import { generateToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
       })
     }
     
-    const existingUser = await User.findOne({ email })
+    const existingUser = await UserModel.findByEmail(email)
     if (existingUser) {
       throw createError({
         statusCode: 400,
@@ -20,8 +20,8 @@ export default defineEventHandler(async (event) => {
       })
     }
     
-    const user = await User.create({ email, password, name })
-    const token = generateToken(user._id.toString())
+    const user = await UserModel.create({ email, password, name })
+    const token = generateToken(user.id.toString())
     
     setCookie(event, 'auth-token', token, {
       httpOnly: true,
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     
     return {
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         name: user.name
       },

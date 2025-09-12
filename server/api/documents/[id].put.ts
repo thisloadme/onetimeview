@@ -1,4 +1,4 @@
-import { Document } from '~/server/models/Document'
+import { DocumentModel } from '~/server/models/Document'
 import { getCurrentUser } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -29,33 +29,21 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  const document = await Document.findById(documentId)
-  
-  if (!document) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Document not found'
-    })
-  }
-  
-  // Check if user is the author of the document
-  if (document.author.toString() !== user._id.toString()) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'You do not have permission to edit this document'
-    })
-  }
-  
-  // Update the document
-  const updatedDocument = await Document.findByIdAndUpdate(
-    documentId,
+  // Update the document (this will check if user is the author)
+  const updatedDocument = await DocumentModel.update(
+    parseInt(documentId),
     {
       title,
-      content,
-      updatedAt: new Date()
-    },
-    { new: true }
+      content
+    }
   )
   
+  if (!updatedDocument) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Document not found or you do not have permission to edit it'
+    })
+  }
+  
   return { document: updatedDocument }
-}) 
+})

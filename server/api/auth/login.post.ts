@@ -1,4 +1,4 @@
-import { User } from '~/server/models/User'
+import { UserModel } from '~/server/models/User'
 import { generateToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -12,15 +12,15 @@ export default defineEventHandler(async (event) => {
       })
     }
     
-    const user = await User.findOne({ email })
-    if (!user || !(await user.comparePassword(password))) {
+    const user = await UserModel.findByEmail(email)
+    if (!user || !(await UserModel.comparePassword(password, user.password))) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Invalid credentials'
       })
     }
     
-    const token = generateToken(user._id.toString())
+    const token = generateToken(user.id.toString())
     
     setCookie(event, 'auth-token', token, {
       httpOnly: true,
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     
     return {
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         name: user.name
       },

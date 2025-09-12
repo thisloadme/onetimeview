@@ -1,4 +1,4 @@
-import { Document } from '~/server/models/Document'
+import { DocumentModel } from '~/server/models/Document'
 import { getCurrentUser } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -20,10 +20,10 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  const document = await Document.create({
+  const document = await DocumentModel.create({
     title,
     content,
-    author: user._id
+    author_id: user.id
   })
   
   return { document }
