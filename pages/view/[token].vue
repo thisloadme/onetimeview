@@ -10,7 +10,7 @@
       </div>
 
       <!-- Access Info -->
-      <div v-if="accessInfo" class="card p-4 mb-6">
+      <!-- <div v-if="accessInfo" class="card p-4 mb-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
@@ -30,7 +30,7 @@
             This was the final view
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Document Content -->
       <div v-if="document" class="card overflow-hidden">

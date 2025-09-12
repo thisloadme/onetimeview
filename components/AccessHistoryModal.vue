@@ -19,7 +19,7 @@
       <!-- Access History Table -->
       <div v-else class="overflow-y-auto max-h-96">
         <div v-if="accessHistory.length > 0" class="space-y-3">
-          <div v-for="access in accessHistory" :key="access._id" class="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+          <div v-for="access in accessHistory" :key="access.id" class="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg border border-gray-600">
             <div class="flex-1">
               <div class="flex items-center gap-3">
                 <div class="w-2 h-2 bg-green-400 rounded-full"></div>

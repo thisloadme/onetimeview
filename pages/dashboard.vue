@@ -38,7 +38,7 @@
       <div v-if="documents.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <DocumentCard 
           v-for="doc in documents" 
-          :key="doc._id" 
+          :key="doc.id" 
           :document="doc"
           @share="shareDocument"
           @view-history="viewAccessHistory"
@@ -121,7 +121,7 @@ const deleteDocument = async (documentId) => {
     })
     
     // Remove from local array
-    documents.value = documents.value.filter(doc => doc._id !== documentId)
+    documents.value = documents.value.filter(doc => doc.id !== documentId)
   } catch (error) {
     alert('Failed to delete document')
   }
