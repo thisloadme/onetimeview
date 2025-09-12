@@ -24,16 +24,16 @@
               <div class="flex items-center gap-3">
                 <div class="w-2 h-2 bg-green-400 rounded-full"></div>
                 <div>
-                  <p class="text-gray-200 font-medium">{{ formatAccessTime(access.accessedAt) }}</p>
-                  <p class="text-gray-400 text-sm">{{ access.ipAddress }}</p>
+                  <p class="text-gray-200 font-medium">{{ formatAccessTime(access.accessed_at) }}</p>
+                  <p class="text-gray-400 text-sm">{{ access.ip_address }}</p>
                 </div>
               </div>
             </div>
             <div class="text-right">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900/30 text-blue-400 border border-blue-800">
-                {{ access.accessType === 'shared_link' ? 'Shared Link' : 'Direct' }}
+                {{ access.access_type === 'shared_link' ? 'Shared Link' : 'Direct' }}
               </span>
-              <p class="text-gray-400 text-xs mt-1">{{ formatUserAgent(access.userAgent) }}</p>
+              <p class="text-gray-400 text-xs mt-1">{{ formatUserAgent(access.user_agent) }}</p>
             </div>
           </div>
         </div>
