@@ -12,11 +12,27 @@
 
     <!-- Editor and Preview -->
     <div class="grid md:grid-cols-2 min-h-96">
-      <!-- Editor -->
-      <div class="border-r border-gray-700 relative">
-        <div class="p-4 bg-gray-900 border-b border-gray-700">
-          <h3 class="font-medium text-gray-100">Editor</h3>
-        </div>
+	    <!-- Editor -->
+	    <div class="border-r border-gray-700 relative">
+	      <div class="p-4 bg-gray-900 border-b border-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+	        <h3 class="font-medium text-gray-100">Editor</h3>
+	        <div class="flex items-center gap-2 text-xs md:text-sm text-gray-300">
+	          <span class="hidden sm:inline text-gray-400">Markdown examples:</span>
+	          <select
+	            class="bg-gray-800 border border-gray-700 rounded-md px-2 py-1 text-xs md:text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+	            @change="handleExampleChange($event.target.value)"
+	          >
+	            <option value="">Choose example...</option>
+	            <option
+	              v-for="example in markdownExamples"
+	              :key="example.key"
+	              :value="example.key"
+	            >
+	              {{ example.label }}
+	            </option>
+	          </select>
+	        </div>
+	      </div>
         <div class="relative">
           <textarea
             ref="textareaRef"
@@ -116,6 +132,59 @@ const renderedMarkdown = computed(() => {
   if (!markdownDocument.value.content) return '<p class="text-gray-500">Preview will be shown here...</p>'
   return marked(markdownDocument.value.content)
 })
+
+// Predefined markdown examples to quickly show supported components
+const markdownExamples = [
+  {
+    key: 'basic',
+    label: 'Basic formatting',
+    content:
+      '# Welcome to OneTimeView' +
+      '\n\nThis is a **basic** markdown example with some commonly used elements.' +
+      '\n\n## Section title' +
+      '\n- Bullet item 1' +
+      '\n- Bullet item 2' +
+      '\n\n[Visit Nuxt](https://nuxt.com)' +
+      '\n\n> This is a quote block to highlight important information.'
+  },
+  {
+    key: 'technical',
+    label: 'Technical document',
+    content:
+      '# API Specification' +
+      '\n\n## Endpoint' +
+      '\n`GET /api/example`' +
+      '\n\n## Parameters' +
+      '\n| Name | Type | Description |' +
+      '\n|------|------|-------------|' +
+      '\n| id   | int  | Resource ID  |' +
+      '\n\n## Example' +
+      '\n```json' +
+      '\n{"id": 1, "name": "Example"}' +
+      '\n```'
+  },
+  {
+    key: 'full',
+    label: 'Full feature demo',
+    content:
+      '# Project Update' +
+      '\n\n## Summary' +
+      '\n- **Status:** On track' +
+      '\n- _Owner:_ Product Team' +
+      '\n\n## Tasks' +
+      '\n1. Define requirements' +
+      '\n2. Implement backend' +
+      '\n3. Implement frontend' +
+      '\n\n## Code snippet' +
+      '\n```javascript' +
+      '\nfunction greet(name) {' +
+      '\n  console.log(`Hello, ${name}`)' +
+      '\n}' +
+      '\n```' +
+      '\n\n## Notes' +
+      '\n> Links and images are also supported.'
+  }
+]
 
 // Slash commands
 const slashCommands = [
@@ -346,6 +415,21 @@ const hideSlashMenu = () => {
   showSlashMenu.value = false
   searchQuery.value = ''
   selectedCommandIndex.value = 0
+}
+
+const handleExampleChange = (key) => {
+  if (!key) return
+
+  const example = markdownExamples.find((item) => item.key === key)
+  if (!example) return
+
+  markdownDocument.value.content = example.content
+
+  // Reset select back to placeholder after applying
+  nextTick(() => {
+    const select = document.querySelector('select')
+    if (select) select.value = ''
+  })
 }
 
 // Hide menu when clicking outside

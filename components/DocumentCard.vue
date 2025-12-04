@@ -15,14 +15,14 @@
       <span>{{ formatDate(document.updated_at) }}</span>
     </div>
     
-    <div class="flex gap-2">
+	    <div class="flex gap-2">
       <NuxtLink :to="`/edit/${document.id}`" class="flex-1 text-center py-2 px-4 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition duration-200">
         Edit
       </NuxtLink>
       <button @click="$emit('share', document.id)" class="flex-1 py-2 px-4 bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 border border-blue-800 rounded-lg transition duration-200">
         Share
       </button>
-      <button @click="$emit('viewHistory', document.id, document.title)" class="py-2 px-3 bg-purple-900/30 hover:bg-purple-900/50 text-purple-400 border border-purple-800 rounded-lg transition duration-200">
+	      <button @click="$emit('viewHistory', document.id, document.title)" class="py-2 px-3 bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 border border-blue-800 rounded-lg transition duration-200">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
         </svg>

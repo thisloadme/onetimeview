@@ -84,10 +84,10 @@ const saveDocument = async () => {
 .prose ul { @apply list-disc list-inside mb-4 text-gray-700; }
 .prose ol { @apply list-decimal list-inside mb-4 text-gray-700; }
 .prose li { @apply mb-1; }
-.prose a { @apply text-purple-600 hover:text-purple-800 underline; }
+.prose a { @apply text-blue-700 hover:text-blue-900 underline; }
 .prose strong { @apply font-bold text-gray-900; }
 .prose em { @apply italic; }
 .prose code { @apply bg-gray-100 px-2 py-1 rounded font-mono text-sm; }
 .prose pre { @apply bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4; }
-.prose blockquote { @apply border-l-4 border-purple-500 pl-4 italic text-gray-600 mb-4; }
+.prose blockquote { @apply border-l-4 border-blue-800 pl-4 italic text-gray-600 mb-4; }
 </style>

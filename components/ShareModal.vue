@@ -42,23 +42,53 @@
         </div>
       </form>
 
-      <!-- Generated Link -->
-      <div v-if="generatedLink" class="mt-6 p-4 bg-green-900/20 rounded-lg border border-green-800">
-        <h4 class="font-medium text-green-400 mb-2">Link Created Successfully!</h4>
-        <div class="flex items-center gap-2">
-          <input
-            :value="generatedLink"
-            readonly
-            class="flex-1 px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded text-gray-200"
-          />
-          <button @click="copyLink" class="btn-secondary text-sm">
-            Copy
-          </button>
-        </div>
-        <p class="text-xs text-green-400 mt-2">
-          This link can be accessed {{ shareForm.maxAccesses }} times and expires in {{ shareForm.expiresIn }} hours.
-        </p>
-      </div>
+	      <!-- Active Links -->
+	      <div v-if="activeLinks.length" class="mt-6">
+	        <h4 class="font-medium text-gray-100 mb-1">Active links</h4>
+	        <p class="text-xs text-gray-400 mb-3">
+	          These links are currently active for this document.
+	        </p>
+	        <div class="space-y-3 max-h-48 overflow-y-auto">
+	          <div
+	            v-for="link in activeLinks"
+	            :key="link.token"
+	            class="p-3 bg-gray-900/40 rounded-lg border border-gray-700"
+	          >
+	            <div class="flex items-center gap-2">
+	              <input
+	                :value="link.fullUrl"
+	                readonly
+	                class="flex-1 px-3 py-2 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+	              />
+	              <button @click="copyExistingLink(link)" class="btn-secondary text-xs">
+	                Copy
+	              </button>
+	            </div>
+	            <p class="text-[11px] text-gray-400 mt-1">
+	              Views: {{ link.currentAccesses }} / {{ link.maxAccesses }}
+	              · Expires at {{ new Date(link.expiresAt).toLocaleString() }}
+	            </p>
+	          </div>
+	        </div>
+	      </div>
+
+	      <!-- Generated Link (most recent) -->
+	      <div v-if="generatedLink" class="mt-6 p-4 bg-green-900/20 rounded-lg border border-green-800">
+	        <h4 class="font-medium text-green-400 mb-2">Link created successfully</h4>
+	        <div class="flex items-center gap-2">
+	          <input
+	            :value="generatedLink"
+	            readonly
+	            class="flex-1 px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded text-gray-200"
+	          />
+	          <button @click="copyLink" class="btn-secondary text-sm">
+	            Copy
+	          </button>
+	        </div>
+	        <p class="text-xs text-green-400 mt-2">
+	          This new link can be accessed {{ shareForm.maxAccesses }} times and expires in {{ shareForm.expiresIn }} hours.
+	        </p>
+	      </div>
     </div>
   </div>
 </template>
@@ -79,6 +109,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const loading = ref(false)
 const generatedLink = ref('')
+const activeLinks = ref([])
 
 const shareForm = reactive({
   maxAccesses: 5,
@@ -93,8 +124,11 @@ const createShareLink = async () => {
       method: 'POST',
       body: shareForm
     })
-    
-    generatedLink.value = `${window.location.origin}${sharedLink.url}`
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+    generatedLink.value = `${origin}${sharedLink.url}`
+
+    // Refresh list of active links after creating a new one
+    fetchActiveLinks()
   } catch (error) {
     alert('Failed to create share link')
   } finally {
@@ -111,12 +145,40 @@ const copyLink = async () => {
   }
 }
 
+const copyExistingLink = async (link) => {
+  try {
+    await navigator.clipboard.writeText(link.fullUrl)
+    alert('Link copied to clipboard!')
+  } catch (error) {
+    alert('Failed to copy link')
+  }
+}
+
+const fetchActiveLinks = async () => {
+  try {
+    const { links } = await $fetch(`/api/documents/${props.documentId}/share`)
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+
+    activeLinks.value = (links || []).map((link) => ({
+      ...link,
+      fullUrl: `${origin}${link.url}`
+    }))
+  } catch (error) {
+    // If fetching fails, just clear the list silently
+    activeLinks.value = []
+  }
+}
+
 // Reset form when modal opens
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
     generatedLink.value = ''
     shareForm.maxAccesses = 5
     shareForm.expiresIn = 24
+
+    fetchActiveLinks()
+  } else {
+    activeLinks.value = []
   }
 })
 </script> 

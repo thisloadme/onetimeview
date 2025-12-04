@@ -22,8 +22,8 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative py-20 overflow-hidden hero-gradient">
-      <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+	    <section class="relative py-20 overflow-hidden hero-gradient">
+	      <div class="absolute inset-0 bg-blue-900/20"></div>
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h1 class="text-5xl md:text-6xl font-bold text-gray-100 mb-6">
           Share Markdown Content
@@ -57,9 +57,9 @@
           </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-          <div class="card text-center">
-            <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+	        <div class="grid md:grid-cols-3 gap-8">
+	          <div class="card text-center">
+	            <div class="w-16 h-16 bg-blue-900 rounded-xl flex items-center justify-center mx-auto mb-4">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
               </svg>
@@ -112,8 +112,8 @@
             <p class="text-gray-400">Write your content using our markdown editor. Format text, add links, and create beautiful documents.</p>
           </div>
 
-          <div class="text-center">
-            <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+	          <div class="text-center">
+	            <div class="w-12 h-12 bg-blue-900 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
               2
             </div>
             <h3 class="text-xl font-semibold text-gray-100 mb-2">Set Access Limits</h3>
@@ -178,19 +178,19 @@
             </div>
           </div>
 
-          <!-- Researchers -->
-          <div class="card text-center group hover:transform hover:scale-105 transition-all duration-300">
-            <div class="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:shadow-lg">
+	          <!-- Researchers -->
+	          <div class="card text-center group hover:transform hover:scale-105 transition-all duration-300">
+	            <div class="w-16 h-16 bg-blue-900 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:shadow-lg">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold text-gray-100 mb-2">Researchers</h3>
-            <p class="text-gray-400 text-sm leading-relaxed">
-              Share draft papers and research findings with collaborators. Control who sees your work and when, ensuring your research remains confidential until publication.
-            </p>
-            <div class="mt-4 p-3 bg-purple-900/20 rounded-lg border border-purple-800">
-              <p class="text-purple-400 text-xs font-medium">Perfect for:</p>
+	            <h3 class="text-xl font-semibold text-gray-100 mb-2">Researchers</h3>
+	            <p class="text-gray-400 text-sm leading-relaxed">
+	              Share draft papers and research findings with collaborators. Control who sees your work and when, ensuring your research remains confidential until publication.
+	            </p>
+	            <div class="mt-4 p-3 bg-blue-900/20 rounded-lg border border-blue-800">
+	              <p class="text-blue-300 text-xs font-medium">Perfect for:</p>
               <p class="text-gray-300 text-xs">Draft papers, research proposals, preliminary findings</p>
             </div>
           </div>
@@ -257,8 +257,8 @@
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+	    <!-- CTA Section -->
+	    <section class="py-20 bg-blue-900">
       <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
         <h2 class="text-4xl font-bold text-white mb-4">
           Ready to Share Securely?
