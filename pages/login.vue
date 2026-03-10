@@ -2,8 +2,9 @@
   <div class="min-h-screen bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full">
       <div class="text-center mb-8">
-        <NuxtLink to="/" class="text-3xl font-bold text-gradient">
-          OneTimeView
+        <NuxtLink to="/" class="flex items-center justify-center gap-3">
+          <img src="/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
+          <span class="text-3xl font-bold text-gradient">OneTimeView</span>
         </NuxtLink>
         <h2 class="mt-4 text-2xl font-semibold text-gray-100">
           Welcome back
@@ -60,7 +61,7 @@
         <div class="mt-6 text-center">
           <p class="text-gray-400">
             Don't have an account?
-            <NuxtLink to="/register" class="text-blue-400 font-medium hover:text-blue-300">
+            <NuxtLink to="/register" class="text-[#0e2e4f] font-medium hover:text-[#1d6477]">
               Sign up
             </NuxtLink>
           </p>
@@ -106,3 +107,58 @@ const handleLogin = async () => {
   }
 }
 </script>
+
+<style>
+.card {
+  background: rgba(17, 24, 39, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #0e2e4f;
+  box-shadow: 0 0 0 3px rgba(14, 46, 79, 0.1);
+}
+
+.input-field::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.875rem;
+  background: #0e2e4f;
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1d6477;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(14, 46, 79, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

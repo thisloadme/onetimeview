@@ -6,6 +6,8 @@ export interface Document {
   content: string
   author_id: number
   is_published: boolean
+  total_views: number
+  shared_links_count: number
   created_at: Date
   updated_at: Date
 }

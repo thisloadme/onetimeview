@@ -21,6 +21,7 @@
     "@types/pg": "^8.15.5",
     "bcryptjs": "^3.0.2",
     "cookie-es": "^2.0.0",
+    "gsap": "^3.14.2",
     "jsonwebtoken": "^9.0.2",
     "marked": "^16.0.0",
     "nuxt": "^3.13.0",
