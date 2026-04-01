@@ -480,14 +480,15 @@ const ctaPrimaryBtn = ref(null)
 
 const user = ref(null)
 
-onMounted(async () => {
-  // Check auth status
-  try {
-    const { user: userData } = await $fetch('/api/auth/me')
-    user.value = userData
-  } catch (err) {
-    // User is not logged in, ignore
-  }
+onMounted(() => {
+  // Check auth status asynchronously without blocking GSAP
+  $fetch('/api/auth/me')
+    .then(({ user: userData }) => {
+      user.value = userData
+    })
+    .catch((err) => {
+      // User is not logged in, ignore
+    })
 
   // Navbar scroll effect
   gsap.to(navbar.value, {
