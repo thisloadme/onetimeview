@@ -53,7 +53,7 @@ export class SharedLinkModel {
     const db = getDb()
     const links = db.shared_links.filter(l => l.document_id === documentId)
     // SQL had ORDER BY created_at DESC
-    return links.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+    return links.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   }
   
   static async incrementAccess(id: number): Promise<SharedLink | null> {
@@ -86,7 +86,7 @@ export class SharedLinkModel {
     const link = db.shared_links.find(l => 
       l.token === token && 
       l.is_active === true && 
-      l.expires_at > now
+      new Date(l.expires_at) > now
     )
     return link || null
   }
@@ -108,7 +108,7 @@ export class SharedLinkModel {
     const now = new Date()
     const initialLength = db.shared_links.length
     
-    db.shared_links = db.shared_links.filter(l => l.expires_at > now)
+    db.shared_links = db.shared_links.filter(l => new Date(l.expires_at) > now)
     
     const removedCount = initialLength - db.shared_links.length
     

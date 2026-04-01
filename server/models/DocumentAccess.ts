@@ -45,7 +45,7 @@ export class DocumentAccessModel {
   static async findByDocumentId(documentId: number, limit: number = 50, offset: number|null = null): Promise<DocumentAccess[]> {
     const db = getDb()
     const accesses = db.document_accesses.filter(a => a.document_id === documentId)
-    accesses.sort((a, b) => b.accessed_at.getTime() - a.accessed_at.getTime())
+    accesses.sort((a, b) => new Date(b.accessed_at).getTime() - new Date(a.accessed_at).getTime())
     
     const start = offset || 0
     return accesses.slice(start, start + limit)
@@ -54,7 +54,7 @@ export class DocumentAccessModel {
   static async findBySharedLinkId(sharedLinkId: number, limit: number = 50): Promise<DocumentAccess[]> {
     const db = getDb()
     const accesses = db.document_accesses.filter(a => a.shared_link_id === sharedLinkId)
-    accesses.sort((a, b) => b.accessed_at.getTime() - a.accessed_at.getTime())
+    accesses.sort((a, b) => new Date(b.accessed_at).getTime() - new Date(a.accessed_at).getTime())
     
     return accesses.slice(0, limit)
   }

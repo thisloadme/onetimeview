@@ -57,7 +57,7 @@ export class DocumentModel {
     const db = getDb()
     const documents = db.documents.filter(d => d.author_id === authorId)
     // SQL had ORDER BY created_at DESC
-    return documents.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+    return documents.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   }
   
   static async update(id: number, updateData: UpdateDocumentData): Promise<Document | null> {
