@@ -13,12 +13,22 @@
             <span class="text-gray-300">Quick Create</span>
           </div>
           <div class="flex items-center space-x-4">
-            <NuxtLink to="/login" class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
-              Login
-            </NuxtLink>
-            <NuxtLink to="/register" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
-              Sign Up
-            </NuxtLink>
+            <template v-if="user">
+              <NuxtLink to="/dashboard" class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
+                Dashboard
+              </NuxtLink>
+              <NuxtLink to="/create" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
+                Create Document
+              </NuxtLink>
+            </template>
+            <template v-else>
+              <NuxtLink to="/login" class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
+                Login
+              </NuxtLink>
+              <NuxtLink to="/register" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
+                Sign Up
+              </NuxtLink>
+            </template>
           </div>
         </div>
       </div>
@@ -346,6 +356,8 @@ const anonymousDocument = reactive({
   content: ''
 })
 
+const user = ref(null)
+
 const settings = reactive({
   maxAccesses: 5,
   expiresIn: 24
@@ -600,19 +612,28 @@ const formatExpiration = (hours) => {
   return `${days} day${days > 1 ? 's' : ''}`
 }
 
-onMounted(() => {
+const clickHandler = (event) => {
+  if (!event.target.closest('.relative')) {
+    hideSlashMenu()
+  }
+}
+
+onMounted(async () => {
+  try {
+    const { user: userData } = await $fetch('/api/auth/me')
+    user.value = userData
+  } catch (err) {
+    // User is not logged in
+  }
+
   if (typeof window !== 'undefined') {
-    window.document.addEventListener('click', (event) => {
-      if (!event.target.closest('.relative')) {
-        hideSlashMenu()
-      }
-    })
+    window.document.addEventListener('click', clickHandler)
   }
 })
 
 onUnmounted(() => {
   if (typeof window !== 'undefined') {
-    window.document.removeEventListener('click', hideSlashMenu)
+    window.document.removeEventListener('click', clickHandler)
   }
 })
 </script>

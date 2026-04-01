@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { getDB } from '../plugins/database'
+import { getDb, saveDb, generateId } from '../utils/fileStore'
 
 export interface User {
   id: number
@@ -18,35 +18,35 @@ export interface CreateUserData {
 
 export class UserModel {
   static async create(userData: CreateUserData): Promise<User> {
-    const db = getDB()
+    const db = getDb()
     const hashedPassword = await bcrypt.hash(userData.password, 12)
     
-    const result = await db.query(
-      'INSERT INTO users (email, password, name) VALUES ($1, $2, $3) RETURNING *',
-      [userData.email.toLowerCase().trim(), hashedPassword, userData.name.trim()]
-    )
+    const newUser: User = {
+      id: generateId(db.users),
+      email: userData.email.toLowerCase().trim(),
+      password: hashedPassword,
+      name: userData.name.trim(),
+      created_at: new Date(),
+      updated_at: new Date()
+    }
     
-    return result.rows[0]
+    db.users.push(newUser)
+    await saveDb()
+    
+    return newUser
   }
   
   static async findByEmail(email: string): Promise<User | null> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM users WHERE email = $1',
-      [email.toLowerCase().trim()]
-    )
-    
-    return result.rows[0] || null
+    const db = getDb()
+    const searchEmail = email.toLowerCase().trim()
+    const user = db.users.find(u => u.email === searchEmail)
+    return user || null
   }
   
   static async findById(id: number): Promise<User | null> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM users WHERE id = $1',
-      [id]
-    )
-    
-    return result.rows[0] || null
+    const db = getDb()
+    const user = db.users.find(u => u.id === id)
+    return user || null
   }
   
   static async comparePassword(candidatePassword: string, hashedPassword: string): Promise<boolean> {
@@ -54,14 +54,16 @@ export class UserModel {
   }
   
   static async updatePassword(id: number, newPassword: string): Promise<User> {
-    const db = getDB()
+    const db = getDb()
+    const user = db.users.find(u => u.id === id)
+    if (!user) throw new Error('User not found')
+    
     const hashedPassword = await bcrypt.hash(newPassword, 12)
     
-    const result = await db.query(
-      'UPDATE users SET password = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
-      [hashedPassword, id]
-    )
+    user.password = hashedPassword
+    user.updated_at = new Date()
+    await saveDb()
     
-    return result.rows[0]
+    return user
   }
 }

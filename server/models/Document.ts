@@ -1,4 +1,4 @@
-import { getDB } from '../plugins/database'
+import { getDb, saveDb, generateId } from '../utils/fileStore'
 
 export interface Document {
   id: number
@@ -27,95 +27,82 @@ export interface UpdateDocumentData {
 
 export class DocumentModel {
   static async create(documentData: CreateDocumentData): Promise<Document> {
-    const db = getDB()
+    const db = getDb()
     
-    const result = await db.query(
-      'INSERT INTO documents (title, content, author_id, is_published) VALUES ($1, $2, $3, $4) RETURNING *',
-      [
-        documentData.title.trim(),
-        documentData.content,
-        documentData.author_id,
-        documentData.is_published || false
-      ]
-    )
+    const newDocument: Document = {
+      id: generateId(db.documents),
+      title: documentData.title.trim(),
+      content: documentData.content,
+      author_id: documentData.author_id,
+      is_published: documentData.is_published || false,
+      total_views: 0,
+      shared_links_count: 0,
+      created_at: new Date(),
+      updated_at: new Date()
+    }
     
-    return result.rows[0]
+    db.documents.push(newDocument)
+    await saveDb()
+    
+    return newDocument
   }
   
   static async findById(id: number): Promise<Document | null> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM documents WHERE id = $1',
-      [id]
-    )
-    
-    return result.rows[0] || null
+    const db = getDb()
+    const document = db.documents.find(d => d.id === id)
+    return document || null
   }
   
   static async findByAuthor(authorId: number): Promise<Document[]> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM documents WHERE author_id = $1 ORDER BY created_at DESC',
-      [authorId]
-    )
-    
-    return result.rows
+    const db = getDb()
+    const documents = db.documents.filter(d => d.author_id === authorId)
+    // SQL had ORDER BY created_at DESC
+    return documents.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
   }
   
   static async update(id: number, updateData: UpdateDocumentData): Promise<Document | null> {
-    const db = getDB()
+    const db = getDb()
+    const document = db.documents.find(d => d.id === id)
+    if (!document) return null
     
-    const setParts = []
-    const values = []
-    let paramIndex = 1
+    let updated = false
     
     if (updateData.title !== undefined) {
-      setParts.push(`title = $${paramIndex++}`)
-      values.push(updateData.title.trim())
+      document.title = updateData.title.trim()
+      updated = true
     }
-    
     if (updateData.content !== undefined) {
-      setParts.push(`content = $${paramIndex++}`)
-      values.push(updateData.content)
+      document.content = updateData.content
+      updated = true
     }
-    
     if (updateData.is_published !== undefined) {
-      setParts.push(`is_published = $${paramIndex++}`)
-      values.push(updateData.is_published)
+      document.is_published = updateData.is_published
+      updated = true
     }
     
-    if (setParts.length === 0) {
-      return this.findById(id)
+    if (updated) {
+      document.updated_at = new Date()
+      await saveDb()
     }
     
-    setParts.push(`updated_at = CURRENT_TIMESTAMP`)
-    values.push(id)
-    
-    const result = await db.query(
-      `UPDATE documents SET ${setParts.join(', ')} WHERE id = $${paramIndex} RETURNING *`,
-      values
-    )
-    
-    return result.rows[0] || null
+    return document
   }
   
   static async delete(id: number): Promise<boolean> {
-    const db = getDB()
-    const result = await db.query(
-      'DELETE FROM documents WHERE id = $1',
-      [id]
-    )
+    const db = getDb()
+    const initialLength = db.documents.length
+    db.documents = db.documents.filter(d => d.id !== id)
     
-    return result.rowCount !== null && result.rowCount > 0
+    if (db.documents.length !== initialLength) {
+      await saveDb()
+      return true
+    }
+    return false
   }
   
   static async findByAuthorAndId(authorId: number, documentId: number): Promise<Document | null> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM documents WHERE id = $1 AND author_id = $2',
-      [documentId, authorId]
-    )
-    
-    return result.rows[0] || null
+    const db = getDb()
+    const document = db.documents.find(d => d.id === documentId && d.author_id === authorId)
+    return document || null
   }
 }

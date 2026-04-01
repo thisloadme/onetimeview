@@ -11,15 +11,25 @@
             </NuxtLink>
           </div>
           <div class="flex items-center space-x-4">
-            <NuxtLink to="/create-anonymous" class="text-white hover:text-[#1d6477] transition-colors">
-              Quick Create
-            </NuxtLink>
-            <NuxtLink to="/login" class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
-              Login
-            </NuxtLink>
-            <NuxtLink to="/register" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
-              Get Started
-            </NuxtLink>
+            <template v-if="user">
+              <NuxtLink to="/create" class="text-white hover:text-[#1d6477] transition-colors">
+                New Document
+              </NuxtLink>
+              <NuxtLink to="/dashboard" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
+                Dashboard
+              </NuxtLink>
+            </template>
+            <template v-else>
+              <NuxtLink to="/create-anonymous" class="text-white hover:text-[#1d6477] transition-colors">
+                Quick Create
+              </NuxtLink>
+              <NuxtLink to="/login" class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
+                Login
+              </NuxtLink>
+              <NuxtLink to="/register" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
+                Get Started
+              </NuxtLink>
+            </template>
           </div>
         </div>
       </div>
@@ -468,7 +478,17 @@ const timelineLine = ref(null)
 const ctaSection = ref(null)
 const ctaPrimaryBtn = ref(null)
 
-onMounted(() => {
+const user = ref(null)
+
+onMounted(async () => {
+  // Check auth status
+  try {
+    const { user: userData } = await $fetch('/api/auth/me')
+    user.value = userData
+  } catch (err) {
+    // User is not logged in, ignore
+  }
+
   // Navbar scroll effect
   gsap.to(navbar.value, {
     scrollTrigger: {

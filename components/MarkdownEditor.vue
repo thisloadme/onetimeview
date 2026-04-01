@@ -432,19 +432,21 @@ const handleExampleChange = (key) => {
   })
 }
 
+const clickHandler = (event) => {
+  if (!event.target.closest('.relative')) {
+    hideSlashMenu()
+  }
+}
+
 // Hide menu when clicking outside
 onMounted(() => {
   if (typeof window !== 'undefined') {
-    window.document.addEventListener('click', (event) => {
-      if (!event.target.closest('.relative')) {
-        hideSlashMenu()
-      }
-    })
+    window.document.addEventListener('click', clickHandler)
   }
 })
 
 onUnmounted(() => {
-  if (clickHandler && typeof window !== 'undefined') {
+  if (typeof window !== 'undefined') {
     window.document.removeEventListener('click', clickHandler)
   }
 })

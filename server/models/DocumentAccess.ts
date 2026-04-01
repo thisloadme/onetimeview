@@ -1,4 +1,4 @@
-import { getDB } from '../plugins/database'
+import { getDb, saveDb, generateId } from '../utils/fileStore'
 
 export interface DocumentAccess {
   id: number
@@ -22,60 +22,51 @@ export interface CreateDocumentAccessData {
 
 export class DocumentAccessModel {
   static async create(accessData: CreateDocumentAccessData): Promise<DocumentAccess> {
-    const db = getDB()
+    const db = getDb()
     
-    const result = await db.query(
-      'INSERT INTO document_accesses (document_id, shared_link_id, ip_address, user_agent, access_type) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [
-        accessData.document_id,
-        accessData.shared_link_id || null,
-        accessData.ip_address || null,
-        accessData.user_agent || null,
-        accessData.access_type || 'shared_link'
-      ]
-    )
+    const newAccess: DocumentAccess = {
+      id: generateId(db.document_accesses),
+      document_id: accessData.document_id,
+      shared_link_id: accessData.shared_link_id || null,
+      ip_address: accessData.ip_address || null,
+      user_agent: accessData.user_agent || null,
+      access_type: accessData.access_type || 'shared_link',
+      accessed_at: new Date(),
+      created_at: new Date(),
+      updated_at: new Date()
+    }
     
-    return result.rows[0]
+    db.document_accesses.push(newAccess)
+    await saveDb()
+    
+    return newAccess
   }
   
   static async findByDocumentId(documentId: number, limit: number = 50, offset: number|null = null): Promise<DocumentAccess[]> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM document_accesses WHERE document_id = $1 ORDER BY accessed_at DESC LIMIT $2 OFFSET $3',
-      [documentId, limit, offset || 0]
-    )
+    const db = getDb()
+    const accesses = db.document_accesses.filter(a => a.document_id === documentId)
+    accesses.sort((a, b) => b.accessed_at.getTime() - a.accessed_at.getTime())
     
-    return result.rows
+    const start = offset || 0
+    return accesses.slice(start, start + limit)
   }
   
   static async findBySharedLinkId(sharedLinkId: number, limit: number = 50): Promise<DocumentAccess[]> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM document_accesses WHERE shared_link_id = $1 ORDER BY accessed_at DESC LIMIT $2',
-      [sharedLinkId, limit]
-    )
+    const db = getDb()
+    const accesses = db.document_accesses.filter(a => a.shared_link_id === sharedLinkId)
+    accesses.sort((a, b) => b.accessed_at.getTime() - a.accessed_at.getTime())
     
-    return result.rows
+    return accesses.slice(0, limit)
   }
   
   static async countByDocumentId(documentId: number): Promise<number> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT COUNT(*) as count FROM document_accesses WHERE document_id = $1',
-      [documentId]
-    )
-    
-    return parseInt(result.rows[0].count)
+    const db = getDb()
+    return db.document_accesses.filter(a => a.document_id === documentId).length
   }
   
   static async countBySharedLinkId(sharedLinkId: number): Promise<number> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT COUNT(*) as count FROM document_accesses WHERE shared_link_id = $1',
-      [sharedLinkId]
-    )
-    
-    return parseInt(result.rows[0].count)
+    const db = getDb()
+    return db.document_accesses.filter(a => a.shared_link_id === sharedLinkId).length
   }
   
   static async getAccessStats(documentId: number): Promise<{
@@ -84,23 +75,19 @@ export class DocumentAccessModel {
     direct_accesses: number
     unique_ips: number
   }> {
-    const db = getDB()
-    const result = await db.query(`
-      SELECT 
-        COUNT(*) as total_accesses,
-        COUNT(CASE WHEN access_type = 'shared_link' THEN 1 END) as shared_link_accesses,
-        COUNT(CASE WHEN access_type = 'direct' THEN 1 END) as direct_accesses,
-        COUNT(DISTINCT ip_address) as unique_ips
-      FROM document_accesses 
-      WHERE document_id = $1
-    `, [documentId])
+    const db = getDb()
+    const accesses = db.document_accesses.filter(a => a.document_id === documentId)
     
-    const row = result.rows[0]
+    const sharedLinkAccesses = accesses.filter(a => a.access_type === 'shared_link').length
+    const directAccesses = accesses.filter(a => a.access_type === 'direct').length
+    
+    const uniqueIps = new Set(accesses.map(a => a.ip_address).filter(Boolean))
+    
     return {
-      total_accesses: parseInt(row.total_accesses),
-      shared_link_accesses: parseInt(row.shared_link_accesses),
-      direct_accesses: parseInt(row.direct_accesses),
-      unique_ips: parseInt(row.unique_ips)
+      total_accesses: accesses.length,
+      shared_link_accesses: sharedLinkAccesses,
+      direct_accesses: directAccesses,
+      unique_ips: uniqueIps.size
     }
   }
 }

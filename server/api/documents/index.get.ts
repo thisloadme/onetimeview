@@ -1,4 +1,4 @@
-import { getDB } from '~/server/plugins/database'
+import { getDb } from '~/server/utils/fileStore'
 import { getCurrentUser } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -11,21 +11,24 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  const db = getDB()
+  const db = getDb()
   
-  const result = await db.query(
-    `SELECT 
-      d.*,
-      COALESCE(SUM(da.access_count), 0) as total_views,
-      COUNT(DISTINCT sl.id) as shared_links_count
-    FROM documents d
-    LEFT JOIN document_access da ON d.id = da.document_id
-    LEFT JOIN shared_links sl ON d.id = sl.document_id AND sl.is_active = true
-    WHERE d.author_id = $1
-    GROUP BY d.id
-    ORDER BY d.created_at DESC`,
-    [user.id]
-  )
+  const userDocuments = db.documents.filter(d => d.author_id === user.id)
   
-  return { documents: result.rows }
+  const result = userDocuments.map(doc => {
+    const views = db.document_accesses.filter(da => da.document_id === doc.id).length
+    
+    // In SQL it was COUNT(DISTINCT sl.id) which equivalent to length of unique links
+    const sharedLinks = db.shared_links.filter(sl => sl.document_id === doc.id && sl.is_active === true)
+    
+    return {
+      ...doc,
+      total_views: views,
+      shared_links_count: sharedLinks.length
+    }
+  })
+  
+  result.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+  
+  return { documents: result }
 })

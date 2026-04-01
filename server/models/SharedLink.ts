@@ -1,4 +1,4 @@
-import { getDB } from '../plugins/database'
+import { getDb, saveDb, generateId } from '../utils/fileStore'
 
 export interface SharedLink {
   id: number
@@ -23,89 +23,99 @@ export interface CreateSharedLinkData {
 
 export class SharedLinkModel {
   static async create(linkData: CreateSharedLinkData): Promise<SharedLink> {
-    const db = getDB()
+    const db = getDb()
     
-    const result = await db.query(
-      'INSERT INTO shared_links (document_id, token, max_accesses, current_accesses, is_active, expires_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [
-        linkData.document_id,
-        linkData.token,
-        linkData.max_accesses,
-        linkData.current_accesses || 0,
-        linkData.is_active !== undefined ? linkData.is_active : true,
-        linkData.expires_at
-      ]
-    )
+    const newLink: SharedLink = {
+      id: generateId(db.shared_links),
+      document_id: linkData.document_id,
+      token: linkData.token,
+      max_accesses: linkData.max_accesses,
+      current_accesses: linkData.current_accesses || 0,
+      is_active: linkData.is_active !== undefined ? linkData.is_active : true,
+      expires_at: linkData.expires_at,
+      created_at: new Date(),
+      updated_at: new Date()
+    }
     
-    return result.rows[0]
+    db.shared_links.push(newLink)
+    await saveDb()
+    
+    return newLink
   }
   
   static async findByToken(token: string): Promise<SharedLink | null> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM shared_links WHERE token = $1',
-      [token]
-    )
-    
-    return result.rows[0] || null
+    const db = getDb()
+    const link = db.shared_links.find(l => l.token === token)
+    return link || null
   }
   
   static async findByDocumentId(documentId: number): Promise<SharedLink[]> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM shared_links WHERE document_id = $1 ORDER BY created_at DESC',
-      [documentId]
-    )
-    
-    return result.rows
+    const db = getDb()
+    const links = db.shared_links.filter(l => l.document_id === documentId)
+    // SQL had ORDER BY created_at DESC
+    return links.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
   }
   
   static async incrementAccess(id: number): Promise<SharedLink | null> {
-    const db = getDB()
-    const result = await db.query(
-      'UPDATE shared_links SET current_accesses = current_accesses + 1, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
-      [id]
-    )
+    const db = getDb()
+    const link = db.shared_links.find(l => l.id === id)
+    if (!link) return null
     
-    return result.rows[0] || null
+    link.current_accesses += 1
+    link.updated_at = new Date()
+    await saveDb()
+    
+    return link
   }
   
   static async deactivate(id: number): Promise<SharedLink | null> {
-    const db = getDB()
-    const result = await db.query(
-      'UPDATE shared_links SET is_active = false, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
-      [id]
-    )
+    const db = getDb()
+    const link = db.shared_links.find(l => l.id === id)
+    if (!link) return null
     
-    return result.rows[0] || null
+    link.is_active = false
+    link.updated_at = new Date()
+    await saveDb()
+    
+    return link
   }
   
   static async findActiveByToken(token: string): Promise<SharedLink | null> {
-    const db = getDB()
-    const result = await db.query(
-      'SELECT * FROM shared_links WHERE token = $1 AND is_active = true AND expires_at > NOW()',
-      [token]
+    const db = getDb()
+    const now = new Date()
+    const link = db.shared_links.find(l => 
+      l.token === token && 
+      l.is_active === true && 
+      l.expires_at > now
     )
-    
-    return result.rows[0] || null
+    return link || null
   }
   
   static async delete(id: number): Promise<boolean> {
-    const db = getDB()
-    const result = await db.query(
-      'DELETE FROM shared_links WHERE id = $1',
-      [id]
-    )
+    const db = getDb()
+    const initialLength = db.shared_links.length
+    db.shared_links = db.shared_links.filter(l => l.id !== id)
     
-    return result.rowCount !== null && result.rowCount > 0
+    if (db.shared_links.length !== initialLength) {
+      await saveDb()
+      return true
+    }
+    return false
   }
   
   static async cleanupExpired(): Promise<number> {
-    const db = getDB()
-    const result = await db.query(
-      'DELETE FROM shared_links WHERE expires_at <= NOW()'
-    )
+    const db = getDb()
+    const now = new Date()
+    const initialLength = db.shared_links.length
     
-    return result.rowCount !== null ? result.rowCount : 0
+    db.shared_links = db.shared_links.filter(l => l.expires_at > now)
+    
+    const removedCount = initialLength - db.shared_links.length
+    
+    if (removedCount > 0) {
+      await saveDb()
+    }
+    
+    return removedCount
   }
 }

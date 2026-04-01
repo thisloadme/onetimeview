@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-900 flex">
     <!-- Sidebar -->
-    <aside :class="['fixed lg:static inset-y-0 left-0 z-40 w-72 bg-gray-950 border-r border-gray-800 transition-transform duration-300 lg:transform-none flex flex-col h-full', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
+    <aside :class="['fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 w-72 bg-gray-950 border-r border-gray-800 transition-transform duration-300 lg:transform-none flex flex-col h-screen', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
       <!-- Logo -->
       <div class="p-6 border-b border-gray-800 flex-shrink-0">
         <NuxtLink to="/" class="flex items-center gap-3">
