@@ -130,7 +130,9 @@ const createShareLink = async () => {
     // Refresh list of active links after creating a new one
     fetchActiveLinks()
   } catch (error) {
-    alert('Failed to create share link')
+    // ⚠️ P2.13: Better error feedback instead of silent fail
+    console.error('Failed to create share link:', error)
+    alert('Failed to create share link. Please try again.')
   } finally {
     loading.value = false
   }

@@ -2,6 +2,9 @@ import { DocumentModel } from '~/server/models/Document'
 import { SharedLinkModel } from '~/server/models/SharedLink'
 import crypto from 'crypto'
 
+const MAX_TITLE_LENGTH = 200
+const MAX_CONTENT_LENGTH = 50 * 1024 // 50KB
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { title, content, maxAccesses, expiresIn } = body
@@ -18,6 +21,21 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'Content is required'
+    })
+  }
+
+  // ⚠️ P1.8: Content length validation
+  if (title.trim().length > MAX_TITLE_LENGTH) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Title must be ${MAX_TITLE_LENGTH} characters or less`
+    })
+  }
+
+  if (content.trim().length > MAX_CONTENT_LENGTH) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Content must be ${MAX_CONTENT_LENGTH / 1024}KB or less`
     })
   }
 
@@ -48,7 +66,7 @@ export default defineEventHandler(async (event) => {
 
   // Calculate expiration date
   const expiresAt = new Date()
-  expiresAt.setTime(expiresAt.getTime() + (expiresIn * 60 * 60 * 1000)) // Convert hours to milliseconds
+  expiresAt.setTime(expiresAt.getTime() + (expiresIn * 60 * 60 * 1000))
 
   // Create shared link
   const sharedLink = await SharedLinkModel.create({
@@ -61,8 +79,9 @@ export default defineEventHandler(async (event) => {
   })
 
   // Construct the full URL
-  const baseUrl = process.env.NODE_ENV === 'production' 
-    ? process.env.BASE_URL || 'https://yourdomain.com'
+  const config = useRuntimeConfig()
+  const baseUrl = process.env.NODE_ENV === 'production'
+    ? config.public.baseUrl
     : 'http://localhost:3000'
 
   return {

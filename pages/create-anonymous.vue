@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center h-20">
           <div class="flex items-center space-x-4">
             <NuxtLink to="/" class="flex items-center gap-3">
-              <img src="/assets/images/logo.png" alt="OneTimeView" class="h-8 w-auto" />
+              <img src="~/assets/images/logo.png" alt="OneTimeView" class="h-8 w-auto" />
               <span class="text-3xl font-bold text-gradient">OneTimeView</span>
             </NuxtLink>
             <span class="text-gray-600">/</span>

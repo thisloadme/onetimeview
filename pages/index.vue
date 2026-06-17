@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center h-20">
           <div class="flex items-center">
             <NuxtLink to="/" class="flex items-center gap-3">
-              <img src="/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
+              <img src="~/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
               <span class="text-3xl font-bold text-gradient nav-logo">OneTimeView</span>
             </NuxtLink>
           </div>
@@ -27,7 +27,7 @@
                 Login
               </NuxtLink>
               <NuxtLink to="/register" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
-                Get Started
+                Sign Up
               </NuxtLink>
             </template>
           </div>
@@ -420,7 +420,7 @@
         <div class="grid md:grid-cols-4 gap-12 mb-12">
           <div class="md:col-span-2">
             <div class="flex items-center gap-3 mb-4">
-              <img src="/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
+              <img src="~/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
               <h3 class="text-2xl font-bold text-gradient">OneTimeView</h3>
             </div>
             <p class="text-gray-500 mb-4 max-w-md">Secure markdown sharing made simple. Share documents with confidence knowing they'll expire after use.</p>
@@ -436,19 +436,19 @@
           <div>
             <h4 class="font-semibold mb-4">Product</h4>
             <ul class="space-y-2">
-              <li><a href="#" class="text-gray-500 hover:text-white transition-colors">Features</a></li>
-              <li><a href="#" class="text-gray-500 hover:text-white transition-colors">Pricing</a></li>
-              <li><a href="#" class="text-gray-500 hover:text-white transition-colors">Use Cases</a></li>
-              <li><a href="/create-anonymous" class="text-gray-500 hover:text-white transition-colors">Try It Free</a></li>
+              <li><NuxtLink to="/create-anonymous" class="text-gray-500 hover:text-white transition-colors">Features</NuxtLink></li>
+              <li><NuxtLink to="/create-anonymous" class="text-gray-500 hover:text-white transition-colors">Pricing</NuxtLink></li>
+              <li><NuxtLink to="/create-anonymous" class="text-gray-500 hover:text-white transition-colors">Use Cases</NuxtLink></li>
+              <li><NuxtLink to="/create-anonymous" class="text-gray-500 hover:text-white transition-colors">Try It Free</NuxtLink></li>
             </ul>
           </div>
           <div>
             <h4 class="font-semibold mb-4">Company</h4>
             <ul class="space-y-2">
-              <li><a href="#" class="text-gray-500 hover:text-white transition-colors">About</a></li>
-              <li><a href="#" class="text-gray-500 hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" class="text-gray-500 hover:text-white transition-colors">Privacy</a></li>
-              <li><a href="#" class="text-gray-500 hover:text-white transition-colors">Terms</a></li>
+              <li><NuxtLink to="/" class="text-gray-500 hover:text-white transition-colors">About</NuxtLink></li>
+              <li><NuxtLink to="/create-anonymous" class="text-gray-500 hover:text-white transition-colors">Blog</NuxtLink></li>
+              <li><NuxtLink to="/" class="text-gray-500 hover:text-white transition-colors">Privacy</NuxtLink></li>
+              <li><NuxtLink to="/" class="text-gray-500 hover:text-white transition-colors">Terms</NuxtLink></li>
             </ul>
           </div>
         </div>

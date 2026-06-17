@@ -1,21 +1,9 @@
-import { getDb, saveDb, generateId } from '../utils/fileStore'
-
-export interface Document {
-  id: number
-  title: string
-  content: string
-  author_id: number
-  is_published: boolean
-  total_views: number
-  shared_links_count: number
-  created_at: Date
-  updated_at: Date
-}
+import prisma from '../utils/prisma'
 
 export interface CreateDocumentData {
   title: string
   content: string
-  author_id: number
+  author_id?: number | null
   is_published?: boolean
 }
 
@@ -26,83 +14,81 @@ export interface UpdateDocumentData {
 }
 
 export class DocumentModel {
-  static async create(documentData: CreateDocumentData): Promise<Document> {
-    const db = getDb()
-    
-    const newDocument: Document = {
-      id: generateId(db.documents),
-      title: documentData.title.trim(),
-      content: documentData.content,
-      author_id: documentData.author_id,
-      is_published: documentData.is_published || false,
-      total_views: 0,
-      shared_links_count: 0,
-      created_at: new Date(),
-      updated_at: new Date()
-    }
-    
-    db.documents.push(newDocument)
-    await saveDb()
-    
-    return newDocument
-  }
-  
-  static async findById(id: number): Promise<Document | null> {
-    const db = getDb()
-    const document = db.documents.find(d => d.id === id)
-    return document || null
-  }
-  
-  static async findByAuthor(authorId: number): Promise<Document[]> {
-    const db = getDb()
-    const documents = db.documents.filter(d => d.author_id === authorId)
-    // SQL had ORDER BY created_at DESC
-    return documents.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-  }
-  
-  static async update(id: number, updateData: UpdateDocumentData): Promise<Document | null> {
-    const db = getDb()
-    const document = db.documents.find(d => d.id === id)
-    if (!document) return null
-    
-    let updated = false
-    
-    if (updateData.title !== undefined) {
-      document.title = updateData.title.trim()
-      updated = true
-    }
-    if (updateData.content !== undefined) {
-      document.content = updateData.content
-      updated = true
-    }
-    if (updateData.is_published !== undefined) {
-      document.is_published = updateData.is_published
-      updated = true
-    }
-    
-    if (updated) {
-      document.updated_at = new Date()
-      await saveDb()
-    }
-    
+  static async create(documentData: CreateDocumentData) {
+    const document = await prisma.document.create({
+      data: {
+        title: documentData.title.trim(),
+        content: documentData.content,
+        author_id: documentData.author_id ?? null,
+        is_published: documentData.is_published ?? false
+      }
+    })
+
     return document
   }
-  
-  static async delete(id: number): Promise<boolean> {
-    const db = getDb()
-    const initialLength = db.documents.length
-    db.documents = db.documents.filter(d => d.id !== id)
-    
-    if (db.documents.length !== initialLength) {
-      await saveDb()
-      return true
-    }
-    return false
+
+  static async findById(id: number) {
+    const document = await prisma.document.findUnique({
+      where: { id }
+    })
+    return document
   }
-  
-  static async findByAuthorAndId(authorId: number, documentId: number): Promise<Document | null> {
-    const db = getDb()
-    const document = db.documents.find(d => d.id === documentId && d.author_id === authorId)
-    return document || null
+
+  static async findByAuthor(authorId: number) {
+    const documents = await prisma.document.findMany({
+      where: { author_id: authorId },
+      orderBy: { created_at: 'desc' }
+    })
+    return documents
+  }
+
+  static async update(id: number, updateData: UpdateDocumentData) {
+    const data: any = {}
+    if (updateData.title !== undefined) data.title = updateData.title.trim()
+    if (updateData.content !== undefined) data.content = updateData.content
+    if (updateData.is_published !== undefined) data.is_published = updateData.is_published
+
+    try {
+      const document = await prisma.document.update({
+        where: { id },
+        data
+      })
+      return document
+    } catch (e: any) {
+      if (e.code === 'P2025') return null
+      throw e
+    }
+  }
+
+  static async delete(id: number) {
+    try {
+      await prisma.document.delete({
+        where: { id }
+      })
+      return true
+    } catch (e: any) {
+      if (e.code === 'P2025') return false
+      throw e
+    }
+  }
+
+  static async findByAuthorAndId(authorId: number, documentId: number) {
+    const document = await prisma.document.findFirst({
+      where: {
+        id: documentId,
+        author_id: authorId
+      }
+    })
+    return document
+  }
+
+  static async incrementViews(id: number) {
+    const document = await prisma.document.update({
+      where: { id },
+      data: {
+        total_views: { increment: 1 }
+      }
+    })
+    return document
   }
 }

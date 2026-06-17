@@ -3,7 +3,7 @@
     <div class="max-w-md w-full">
       <div class="text-center mb-8">
         <NuxtLink to="/" class="flex items-center justify-center gap-3">
-          <img src="/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
+          <img src="~/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
           <span class="text-3xl font-bold text-gradient">OneTimeView</span>
         </NuxtLink>
         <h2 class="mt-4 text-2xl font-semibold text-gray-100">
@@ -113,7 +113,8 @@ const handleRegister = async () => {
 
     await navigateTo('/dashboard')
   } catch (err) {
-    error.value = err.data?.message || 'Registration failed'
+    // ⚠️ FIX P1.5: Nuxt error uses statusMessage, not message
+    error.value = err.data?.statusMessage || err.message || 'Registration failed'
   } finally {
     loading.value = false
   }

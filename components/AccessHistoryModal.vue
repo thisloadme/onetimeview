@@ -18,6 +18,10 @@
 
       <!-- Access History Table -->
       <div v-else class="overflow-y-auto max-h-96">
+        <!-- ⚠️ P2.9: Showing X of Y indicator -->
+        <div v-if="pagination" class="text-sm text-gray-500 mb-3">
+          Showing {{ accessHistory.length }} of {{ pagination.total }} access{{ pagination.total !== 1 ? 'es' : '' }}
+        </div>
         <div v-if="accessHistory.length > 0" class="space-y-3">
           <div v-for="access in accessHistory" :key="access.id" class="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg border border-gray-600">
             <div class="flex-1">

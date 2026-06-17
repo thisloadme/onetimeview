@@ -1,14 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { getDb, saveDb, generateId } from '../utils/fileStore'
-
-export interface User {
-  id: number
-  email: string
-  password: string
-  name: string
-  created_at: Date
-  updated_at: Date
-}
+import prisma from '../utils/prisma'
 
 export interface CreateUserData {
   email: string
@@ -17,53 +8,49 @@ export interface CreateUserData {
 }
 
 export class UserModel {
-  static async create(userData: CreateUserData): Promise<User> {
-    const db = getDb()
+  static async create(userData: CreateUserData) {
     const hashedPassword = await bcrypt.hash(userData.password, 12)
-    
-    const newUser: User = {
-      id: generateId(db.users),
-      email: userData.email.toLowerCase().trim(),
-      password: hashedPassword,
-      name: userData.name.trim(),
-      created_at: new Date(),
-      updated_at: new Date()
-    }
-    
-    db.users.push(newUser)
-    await saveDb()
-    
-    return newUser
+
+    const user = await prisma.user.create({
+      data: {
+        email: userData.email.toLowerCase().trim(),
+        password: hashedPassword,
+        name: userData.name.trim()
+      }
+    })
+
+    return user
   }
-  
-  static async findByEmail(email: string): Promise<User | null> {
-    const db = getDb()
+
+  static async findByEmail(email: string) {
     const searchEmail = email.toLowerCase().trim()
-    const user = db.users.find(u => u.email === searchEmail)
-    return user || null
+    const user = await prisma.user.findUnique({
+      where: { email: searchEmail }
+    })
+    return user
   }
-  
-  static async findById(id: number): Promise<User | null> {
-    const db = getDb()
-    const user = db.users.find(u => u.id === id)
-    return user || null
+
+  static async findById(id: number) {
+    const user = await prisma.user.findUnique({
+      where: { id }
+    })
+    return user
   }
-  
+
   static async comparePassword(candidatePassword: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, hashedPassword)
   }
-  
-  static async updatePassword(id: number, newPassword: string): Promise<User> {
-    const db = getDb()
-    const user = db.users.find(u => u.id === id)
-    if (!user) throw new Error('User not found')
-    
+
+  static async updatePassword(id: number, newPassword: string) {
     const hashedPassword = await bcrypt.hash(newPassword, 12)
-    
-    user.password = hashedPassword
-    user.updated_at = new Date()
-    await saveDb()
-    
+
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        password: hashedPassword
+      }
+    })
+
     return user
   }
 }

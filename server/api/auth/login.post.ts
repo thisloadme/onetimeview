@@ -1,17 +1,18 @@
 import { UserModel } from '~/server/models/User'
 import { generateToken } from '~/server/utils/auth'
+import { withRateLimit } from '~/server/utils/rateLimiter'
 
-export default defineEventHandler(async (event) => {
+export default withRateLimit(async (event) => {
   try {
     const { email, password } = await readBody(event)
-    
+
     if (!email || !password) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Email and password are required'
       })
     }
-    
+
     const user = await UserModel.findByEmail(email)
     if (!user || !(await UserModel.comparePassword(password, user.password))) {
       throw createError({
@@ -19,16 +20,16 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Invalid credentials'
       })
     }
-    
+
     const token = generateToken(user.id.toString())
-    
+
     setCookie(event, 'auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7 // 7 days
     })
-    
+
     return {
       user: {
         id: user.id,
@@ -43,4 +44,4 @@ export default defineEventHandler(async (event) => {
       statusMessage: error.statusMessage || 'Login failed'
     })
   }
-})
+}, { maxRequests: 10, windowSeconds: 60 })

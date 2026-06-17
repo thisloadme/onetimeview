@@ -5,7 +5,6 @@
 </template>
 
 <script setup>
-// Global head configuration
 useHead({
   title: 'OneTimeView - Secure Document Sharing Platform',
   meta: [
@@ -17,11 +16,18 @@ useHead({
     { name: 'robots', content: 'index, follow' },
     { name: 'googlebot', content: 'index, follow' },
     { name: 'bingbot', content: 'index, follow' },
-  ],
-  link: [
-    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap' }
+
+    // ⚠️ P3.11: OpenGraph meta tags for social media previews
+    { property: 'og:title', content: 'OneTimeView - Secure Document Sharing Platform' },
+    { property: 'og:description', content: 'Share documents with limited-access links that automatically expire. Secure, simple, and private.' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: '/images/og-image.svg' },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'OneTimeView - Secure Document Sharing' },
+    { name: 'twitter:description', content: 'Share documents with limited-access links that automatically expire.' },
+    { name: 'twitter:image', content: '/images/og-image.svg' },
   ]
 })
 </script>

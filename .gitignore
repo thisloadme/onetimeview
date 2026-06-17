@@ -137,3 +137,4 @@ data/database.json
 # Lock files
 # package-lock.json
 # yarn.lock
+/generated/prisma
