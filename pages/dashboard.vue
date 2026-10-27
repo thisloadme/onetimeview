@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-900 flex">
+  <div class="workspace-shell min-h-[100dvh] flex" @keydown.esc="closeSidebar">
     <!-- Sidebar -->
-    <aside :class="['fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 w-72 bg-gray-950 border-r border-gray-800 transition-transform duration-300 lg:transform-none flex flex-col h-screen', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
+    <aside id="app-sidebar" :class="['workspace-sidebar fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 w-72 border-r transition-transform duration-300 lg:transform-none flex flex-col min-h-[100dvh]', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
       <div class="p-6 border-b border-gray-800 flex-shrink-0">
         <NuxtLink to="/" class="flex items-center gap-3">
           <img src="~/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
@@ -45,69 +45,23 @@
 
     <div v-if="sidebarOpen" @click="closeSidebar" class="fixed inset-0 bg-black/50 z-30 lg:hidden"></div>
 
-    <main class="flex-1 flex flex-col min-h-screen lg:ml-0">
+    <main class="workspace-main flex-1 flex flex-col min-h-[100dvh] lg:ml-0">
       <header class="lg:hidden flex items-center justify-between p-4 border-b border-gray-800 bg-gray-900">
-        <button @click="toggleSidebar" class="p-2 text-gray-400 hover:text-white">
+        <button type="button" @click="toggleSidebar" :aria-expanded="sidebarOpen" aria-controls="app-sidebar" :aria-label="sidebarOpen ? 'Close navigation' : 'Open navigation'" class="p-2 text-gray-400 hover:text-white">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
         <span class="text-xl font-bold text-[#0e2e4f]">OneTimeView</span>
-        <NuxtLink to="/create" class="p-2 bg-[#0e2e4f] rounded-lg text-white">
+        <NuxtLink to="/create" aria-label="Create document" class="p-2 bg-[#0e2e4f] rounded-lg text-white">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
         </NuxtLink>
       </header>
 
       <div class="flex-1 p-4 lg:p-8">
-        <!-- Stats Overview -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div v-if="loading" v-for="i in 4" :key="'stat-skel-'+i" class="stat-card bg-gray-800 border border-gray-700 rounded-2xl p-6 animate-pulse">
-            <div class="h-4 bg-gray-700 rounded w-24 mb-4"></div>
-            <div class="h-8 bg-gray-700 rounded w-16"></div>
-          </div>
-          <template v-else>
-            <div class="stat-card bg-gray-800 border border-gray-700 rounded-2xl p-6">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-sm">Total Documents</span>
-                <div class="w-10 h-10 bg-[#0e2e4f]/20 rounded-lg flex items-center justify-center">
-                  <svg class="w-5 h-5 text-[#0e2e4f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                </div>
-              </div>
-              <p class="text-3xl font-bold text-white">{{ stats.totalDocuments }}</p>
-            </div>
-            <div class="stat-card bg-gray-800 border border-gray-700 rounded-2xl p-6">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-sm">Published</span>
-                <div class="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
-                  <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-              </div>
-              <p class="text-3xl font-bold text-white">{{ stats.publishedDocuments }}</p>
-            </div>
-            <div class="stat-card bg-gray-800 border border-gray-700 rounded-2xl p-6">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-sm">Total Views</span>
-                <div class="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
-                  <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                </div>
-              </div>
-              <p class="text-3xl font-bold text-white">{{ stats.totalViews }}</p>
-            </div>
-            <div class="stat-card bg-gray-800 border border-gray-700 rounded-2xl p-6">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-sm">Active Links</span>
-                <div class="w-10 h-10 bg-orange-600/20 rounded-lg flex items-center justify-center">
-                  <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                </div>
-              </div>
-              <p class="text-3xl font-bold text-white">{{ stats.activeLinks }}</p>
-            </div>
-          </template>
-        </div>
-
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 class="text-3xl font-bold text-gray-100">My Documents</h1>
-            <p class="text-gray-400 mt-1">Create and manage your shared documents</p>
+            <h1 class="text-4xl font-bold text-gray-100">Your documents</h1>
+            <p class="text-gray-400 mt-1">Write, share, and keep track of each note.</p>
           </div>
           <NuxtLink to="/create" class="px-6 py-3 bg-[#0e2e4f] text-white font-semibold rounded-xl hover:bg-[#1d6477] transition-all flex items-center gap-2 justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -134,8 +88,8 @@
         </div>
 
         <!-- Loading Skeleton Grid -->
-        <div v-if="loading" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <div v-for="i in 6" :key="'skel-'+i" class="bg-gray-800 border border-gray-700 rounded-2xl p-6 animate-pulse">
+        <div v-if="loading" class="document-stack" aria-label="Loading documents" aria-busy="true">
+          <div v-for="i in 4" :key="'skel-'+i" class="document-skeleton">
             <div class="flex justify-between mb-4">
               <div class="flex-1">
                 <div class="h-5 bg-gray-700 rounded w-3/4 mb-3"></div>
@@ -157,8 +111,14 @@
           </div>
         </div>
 
-        <!-- Documents Grid -->
-        <div v-else-if="filteredDocuments.length > 0" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div v-else-if="loadError" class="empty-note" role="alert">
+          <h2 class="text-2xl font-bold text-gray-100">Documents could not load</h2>
+          <p class="text-gray-400">{{ loadError }}</p>
+          <button type="button" class="btn-secondary mt-3" @click="loadPage(pagination?.page || 1)">Try again</button>
+        </div>
+
+        <!-- Document list -->
+        <div v-else-if="filteredDocuments.length > 0" class="document-stack">
           <EnhancedDocumentCard
             v-for="doc in filteredDocuments"
             :key="doc.id"
@@ -170,7 +130,7 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else class="text-center py-16">
+        <div v-else class="empty-note text-center py-16">
           <div class="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg class="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           </div>
@@ -236,7 +196,6 @@ definePageMeta({ middleware: 'auth' })
 
 const user = ref(null)
 const documents = ref([])
-const allDocuments = ref([]) // full list for client-side filtering
 const pagination = ref(null)
 const showShareModal = ref(false)
 const showAccessHistoryModal = ref(false)
@@ -247,18 +206,12 @@ const searchQuery = ref('')
 const filterStatus = ref('all')
 const sortBy = ref('newest')
 const loading = ref(true)
+const loadError = ref('')
 
 // Delete modal
 const showDeleteModal = ref(false)
 const deleteTargetId = ref(null)
 const deleting = ref(false)
-
-const stats = computed(() => ({
-  totalDocuments: allDocuments.value.length,
-  publishedDocuments: allDocuments.value.filter(d => d.is_published).length,
-  totalViews: allDocuments.value.reduce((sum, d) => sum + (d.total_views || 0), 0),
-  activeLinks: allDocuments.value.filter(d => d.is_published).length
-}))
 
 const filteredDocuments = computed(() => {
   let filtered = [...documents.value]
@@ -290,6 +243,7 @@ const visiblePages = computed(() => {
 
 const loadPage = async (page = 1) => {
   loading.value = true
+  loadError.value = ''
   try {
     const { documents: docs, pagination: p } = await $fetch(`/api/documents?page=${page}&limit=12`)
     documents.value = docs
@@ -297,6 +251,7 @@ const loadPage = async (page = 1) => {
   } catch (err) {
     documents.value = []
     pagination.value = null
+    loadError.value = err.data?.statusMessage || 'Please check your connection and try again.'
   } finally {
     loading.value = false
   }
@@ -306,17 +261,12 @@ onMounted(async () => {
   try {
     const { user: userData } = await $fetch('/api/auth/me')
     user.value = userData
-    const allData = await $fetch('/api/documents?limit=200')
-    allDocuments.value = allData.documents || []
-
-    const firstPage = await $fetch('/api/documents?page=1&limit=12')
-    documents.value = firstPage.documents || []
-    pagination.value = firstPage.pagination || null
   } catch (err) {
     await navigateTo('/login')
-  } finally {
-    loading.value = false
+    return
   }
+
+  await loadPage(1)
 })
 
 const handleLogout = async () => {
@@ -341,7 +291,6 @@ const executeDelete = async () => {
   deleting.value = true
   try {
     await $fetch(`/api/documents/${deleteTargetId.value}`, { method: 'DELETE' })
-    allDocuments.value = allDocuments.value.filter(doc => doc.id !== deleteTargetId.value)
     documents.value = documents.value.filter(doc => doc.id !== deleteTargetId.value)
     if (pagination.value) pagination.value.total -= 1
     showDeleteModal.value = false
@@ -359,10 +308,3 @@ const viewAccessHistory = (documentId, documentTitle) => {
   showAccessHistoryModal.value = true
 }
 </script>
-
-<style>
-.stat-card { transition: all 0.3s ease; }
-.stat-card:hover { transform: translateY(-4px); border-color: #1d6477; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
-.nav-link { transition: all 0.2s ease; }
-.nav-link:hover { transform: translateX(4px); }
-</style>

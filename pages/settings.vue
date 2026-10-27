@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-900 flex">
+  <div class="workspace-shell min-h-[100dvh] flex" @keydown.esc="closeSidebar">
     <!-- Sidebar (same as dashboard) -->
-    <aside :class="['fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 w-72 bg-gray-950 border-r border-gray-800 transition-transform duration-300 lg:transform-none flex flex-col h-screen', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
+    <aside id="app-sidebar" :class="['workspace-sidebar fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 w-72 border-r transition-transform duration-300 lg:transform-none flex flex-col min-h-[100dvh]', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
       <div class="p-6 border-b border-gray-800 flex-shrink-0">
         <NuxtLink to="/" class="flex items-center gap-3">
           <img src="~/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />
@@ -16,6 +16,12 @@
         <NuxtLink to="/create" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           New Document
+        </NuxtLink>
+        <NuxtLink to="/create-anonymous" class="nav-link flex items-center gap-3 px-4 pl-11 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+          Quick Create
+        </NuxtLink>
+        <NuxtLink to="/settings" class="nav-link flex items-center gap-3 px-4 pl-11 py-3 rounded-xl text-gray-300 hover:bg-gray-800 hover:text-white transition-all" active-class="bg-[#0e2e4f] text-white border border-[#1d6477]/50 shadow-md">
+          Settings
         </NuxtLink>
       </nav>
       <div class="p-4 border-t border-gray-800 flex-shrink-0">
@@ -37,9 +43,9 @@
 
     <div v-if="sidebarOpen" @click="closeSidebar" class="fixed inset-0 bg-black/50 z-30 lg:hidden"></div>
 
-    <main class="flex-1 flex flex-col min-h-screen lg:ml-0">
+    <main class="workspace-main flex-1 flex flex-col min-h-[100dvh] lg:ml-0">
       <header class="lg:hidden flex items-center justify-between p-4 border-b border-gray-800 bg-gray-900">
-        <button @click="toggleSidebar" class="p-2 text-gray-400 hover:text-white">
+        <button type="button" @click="toggleSidebar" :aria-expanded="sidebarOpen" aria-controls="app-sidebar" :aria-label="sidebarOpen ? 'Close navigation' : 'Open navigation'" class="p-2 text-gray-400 hover:text-white">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
         <span class="text-xl font-bold text-[#0e2e4f]">Settings</span>
@@ -178,26 +184,3 @@ const handleLogout = async () => {
 const toggleSidebar = () => { sidebarOpen.value = !sidebarOpen.value }
 const closeSidebar = () => { sidebarOpen.value = false }
 </script>
-
-<style scoped>
-.card {
-  background: rgba(17, 24, 39, 0.5);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-}
-.input-field {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(31, 41, 55, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
-  color: white;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-.input-field:focus { outline: none; border-color: #0e2e4f; box-shadow: 0 0 0 3px rgba(14, 46, 79, 0.1); }
-.input-field::placeholder { color: rgba(255, 255, 255, 0.4); }
-.nav-link { transition: all 0.2s ease; }
-.nav-link:hover { transform: translateX(4px); }
-</style>

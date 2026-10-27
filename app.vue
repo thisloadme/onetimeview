@@ -1,33 +1,36 @@
 <template>
-  <div class="min-h-screen bg-gray-900">
+  <div class="app-shell min-h-[100dvh]">
     <NuxtPage />
   </div>
 </template>
 
 <script setup>
+import faviconUrl from '~/assets/images/logo.ico'
+
 useHead({
-  title: 'OneTimeView - Secure Document Sharing Platform',
+    title: 'OneTimeView - Notes with an ending',
   meta: [
-    { name: 'title', content: 'OneTimeView - Secure Document Sharing Platform' },
-    { name: 'description', content: 'Share markdown content with limited access links. Perfect for secure, temporary document sharing. Perfect for consultants, HR professionals, researchers, and developers who need secure, controlled document sharing.' },
+    { name: 'title', content: 'OneTimeView - Notes with an ending' },
+    { name: 'description', content: 'Write a markdown note, set its view and time limits, then share one link.' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { name: 'keywords', content: 'OneTimeView, secure document sharing, markdown sharing, markdown SaaS, limited access links, consultants, HR professionals, researchers, developers' },
+    { name: 'keywords', content: 'OneTimeView, temporary document sharing, markdown notes, limited access links' },
     { name: 'author', content: 'thisloadme' },
     { name: 'robots', content: 'index, follow' },
     { name: 'googlebot', content: 'index, follow' },
     { name: 'bingbot', content: 'index, follow' },
 
     // ⚠️ P3.11: OpenGraph meta tags for social media previews
-    { property: 'og:title', content: 'OneTimeView - Secure Document Sharing Platform' },
-    { property: 'og:description', content: 'Share documents with limited-access links that automatically expire. Secure, simple, and private.' },
+    { property: 'og:title', content: 'OneTimeView - Notes with an ending' },
+    { property: 'og:description', content: 'Write a markdown note, set its view and time limits, then share one link.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:image', content: '/images/og-image.svg' },
     { property: 'og:image:width', content: '1200' },
     { property: 'og:image:height', content: '630' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'OneTimeView - Secure Document Sharing' },
-    { name: 'twitter:description', content: 'Share documents with limited-access links that automatically expire.' },
+    { name: 'twitter:title', content: 'OneTimeView - Notes with an ending' },
+    { name: 'twitter:description', content: 'Write a markdown note, set its view and time limits, then share one link.' },
     { name: 'twitter:image', content: '/images/og-image.svg' },
-  ]
+  ],
+  link: [{ rel: 'icon', type: 'image/x-icon', href: faviconUrl }]
 })
 </script>

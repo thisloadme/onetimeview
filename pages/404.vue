@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-900 flex items-center justify-center py-16 px-4">
+  <div class="auth-page min-h-[100dvh] bg-gray-900 flex items-center justify-center px-4">
     <div class="max-w-lg w-full text-center">
       <div class="mb-8">
         <svg class="w-24 h-24 text-[#1d6477] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

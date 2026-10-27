@@ -5,7 +5,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '~/assets/images/logo.ico' }
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Patrick+Hand&display=swap' }
       ]
     }
   },
@@ -14,8 +16,8 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode'
   ],
   colorMode: {
-    preference: 'dark',
-    fallback: 'dark',
+    preference: 'light',
+    fallback: 'light',
     classSuffix: ''
   },
   css: ['~/assets/css/main.css'],

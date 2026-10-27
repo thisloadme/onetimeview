@@ -1,86 +1,76 @@
 <template>
-  <div class="card overflow-hidden">
-    <!-- Title Input -->
-    <div class="p-6 border-b border-gray-700">
+  <section class="markdown-editor" aria-label="Markdown document editor">
+    <div class="editor-title-row">
+      <label class="sr-only" for="document-title">Document title</label>
       <input
+        id="document-title"
         v-model="markdownDocument.title"
         type="text"
-        placeholder="Document title..."
-        class="w-full text-2xl font-bold text-gray-100 bg-transparent border-none outline-none resize-none placeholder-gray-500"
+        placeholder="Give this note a title"
+        class="editor-title-input"
       />
     </div>
 
-    <!-- Editor and Preview -->
-    <div class="grid md:grid-cols-2 min-h-96">
-	    <!-- Editor -->
-	    <div class="border-r border-gray-700 relative">
-	      <div class="p-4 bg-gray-900 border-b border-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-	        <h3 class="font-medium text-gray-100">Editor</h3>
-	        <div class="flex items-center gap-2 text-xs md:text-sm text-gray-300">
-	          <span class="hidden sm:inline text-gray-400">Markdown examples:</span>
-	          <select
-	            class="bg-gray-800 border border-gray-700 rounded-md px-2 py-1 text-xs md:text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-	            @change="handleExampleChange($event.target.value)"
-	          >
-	            <option value="">Choose example...</option>
-	            <option
-	              v-for="example in markdownExamples"
-	              :key="example.key"
-	              :value="example.key"
-	            >
-	              {{ example.label }}
-	            </option>
-	          </select>
-	        </div>
-	      </div>
-        <div class="relative">
-          <textarea
-            ref="textareaRef"
-            v-model="markdownDocument.content"
-            :placeholder="placeholder"
-            class="w-full h-96 p-6 bg-gray-800 border-none outline-none resize-none font-mono text-sm leading-relaxed text-gray-200 placeholder-gray-500"
-            @input="handleInput"
-            @keydown="handleKeydown"
-            @click="hideSlashMenu"
-          ></textarea>
-          
-          <!-- Slash Command Menu -->
-          <div
-            v-if="showSlashMenu"
-            class="absolute bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-10 min-w-64 max-h-64 overflow-auto"
-            :style="{ top: menuPosition.top + 'px', left: menuPosition.left + 'px' }"
-          >
-            <div class="p-2">
-              <div class="text-xs text-gray-400 mb-2 px-2">Choose format:</div>
-              <div
-                v-for="(command, index) in filteredCommands"
-                :key="command.key"
-                :class="[
-                  'flex items-center px-3 py-2 rounded cursor-pointer transition-colors',
-                  selectedCommandIndex === index ? 'bg-blue-600 text-white' : 'text-gray-200 hover:bg-gray-700'
-                ]"
-                @click="insertCommand(command)"
-              >
-                <span class="text-lg mr-3">{{ command.icon }}</span>
-                <div>
-                  <div class="font-medium">{{ command.label }}</div>
-                  <div class="text-xs opacity-75">{{ command.description }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div class="editor-columns">
+      <section class="editor-pane relative" aria-labelledby="write-heading">
+        <div class="editor-pane-heading">
+          <h2 id="write-heading">Write</h2>
+          <label class="flex items-center gap-2 text-sm" for="markdown-example">
+            <span>Start from</span>
+            <select id="markdown-example" class="px-2 py-1 border border-gray-700 rounded" @change="handleExampleChange($event.target.value)">
+              <option value="">Blank note</option>
+              <option v-for="example in markdownExamples" :key="example.key" :value="example.key">
+                {{ example.label }}
+              </option>
+            </select>
+          </label>
         </div>
-      </div>
+        <textarea
+          ref="textareaRef"
+          v-model="markdownDocument.content"
+          :placeholder="placeholder"
+          class="editor-textarea"
+          aria-label="Markdown content"
+          @input="handleInput"
+          @keydown="handleKeydown"
+          @click="hideSlashMenu"
+        ></textarea>
 
-      <!-- Preview -->
-      <div>
-        <div class="p-4 bg-gray-900 border-b border-gray-700">
-          <h3 class="font-medium text-gray-100">Preview</h3>
+        <div
+          v-if="showSlashMenu"
+          class="editor-command-menu max-h-64 overflow-auto"
+          role="listbox"
+          aria-label="Markdown formatting commands"
+          :style="{ top: menuPosition.top + 'px', left: menuPosition.left + 'px' }"
+        >
+          <p class="px-3 pt-2 pb-1 text-sm text-gray-500">Choose a format</p>
+          <button
+            v-for="(command, index) in filteredCommands"
+            :key="command.key"
+            type="button"
+            class="editor-command-item"
+            role="option"
+            :aria-selected="selectedCommandIndex === index"
+            @click="insertCommand(command)"
+          >
+            <code class="editor-command-key">{{ command.key }}</code>
+            <span>
+              <strong class="block">{{ command.label }}</strong>
+              <span class="block text-sm">{{ command.description }}</span>
+            </span>
+          </button>
         </div>
-        <div class="p-6 h-96 overflow-y-auto prose-dark" v-html="renderedMarkdown"></div>
-      </div>
+      </section>
+
+      <section class="editor-pane" aria-labelledby="preview-heading">
+        <div class="editor-pane-heading">
+          <h2 id="preview-heading">Live preview</h2>
+          <span class="text-sm text-gray-500">What readers will see</span>
+        </div>
+        <div class="editor-preview prose-dark" v-html="renderedMarkdown"></div>
+      </section>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -353,7 +343,6 @@ const handleKeydown = (event) => {
     case 'Tab':
       event.preventDefault()
       if (filteredCommands.value[selectedCommandIndex.value]) {
-        console.log('satu')
         insertCommand(filteredCommands.value[selectedCommandIndex.value])
       }
       break

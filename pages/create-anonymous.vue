@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-900">
+  <div class="anonymous-composer min-h-[100dvh] bg-gray-900">
     <!-- Navigation -->
     <nav class="bg-gray-950 border-b border-gray-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,30 +55,30 @@
         <!-- Editor Section -->
         <div class="lg:col-span-2 space-y-6">
           <!-- Document Editor -->
-          <div class="card">
+          <div class="markdown-editor">
             <!-- Title Input -->
-            <div class="p-6 border-b border-gray-700">
+            <div class="editor-title-row">
               <input
                 v-model="anonymousDocument.title"
                 type="text"
                 placeholder="Enter document title..."
-                class="w-full text-2xl font-bold text-gray-100 bg-transparent border-none outline-none resize-none placeholder-gray-500"
+                class="editor-title-input"
               />
             </div>
 
             <!-- Editor and Preview -->
-            <div class="grid md:grid-cols-2 min-h-[500px]">
+            <div class="editor-columns">
               <!-- Editor -->
               <div class="border-r border-gray-700">
-                <div class="p-4 bg-gray-900 border-b border-gray-700">
-                  <h3 class="font-medium text-gray-100">Editor</h3>
+                <div class="editor-pane-heading">
+                  <h3 class="font-medium text-gray-100">Write</h3>
                 </div>
                 <div class="relative">
                   <textarea
                     ref="textareaRef"
                     v-model="anonymousDocument.content"
                     :placeholder="placeholder"
-                    class="w-full h-[500px] p-6 bg-gray-800 border-none outline-none resize-none font-mono text-sm leading-relaxed text-gray-200 placeholder-gray-500"
+                    class="editor-textarea h-[500px]"
                     @input="handleInput"
                     @keydown="handleKeydown"
                     @click="hideSlashMenu"
@@ -87,7 +87,9 @@
                   <!-- Slash Command Menu -->
                   <div
                     v-if="showSlashMenu"
-                    class="absolute bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-10 min-w-64 max-h-64 overflow-auto"
+                    class="editor-command-menu max-h-64 overflow-auto"
+                    role="listbox"
+                    aria-label="Markdown formatting commands"
                     :style="{ top: menuPosition.top + 'px', left: menuPosition.left + 'px' }"
                   >
                     <div class="p-2">
@@ -95,13 +97,12 @@
                       <div
                         v-for="(command, index) in filteredCommands"
                         :key="command.key"
-                        :class="[
-                          'flex items-center px-3 py-2 rounded cursor-pointer transition-colors',
-                          selectedCommandIndex === index ? 'bg-[#0e2e4f] text-white' : 'text-gray-200 hover:bg-gray-700'
-                        ]"
+                        :class="['editor-command-item', selectedCommandIndex === index ? 'is-selected' : '']"
+                        role="option"
+                        :aria-selected="selectedCommandIndex === index"
                         @click="insertCommand(command)"
                       >
-                        <span class="text-lg mr-3">{{ command.icon }}</span>
+                        <code class="editor-command-key mr-3">{{ command.key }}</code>
                         <div>
                           <div class="font-medium">{{ command.label }}</div>
                           <div class="text-xs opacity-75">{{ command.description }}</div>
@@ -114,10 +115,10 @@
 
               <!-- Preview -->
               <div>
-                <div class="p-4 bg-gray-900 border-b border-gray-700">
-                  <h3 class="font-medium text-gray-100">Preview</h3>
+                <div class="editor-pane-heading">
+                  <h3 class="font-medium text-gray-100">Live preview</h3>
                 </div>
-                <div class="p-6 h-[500px] overflow-y-auto prose-dark" v-html="renderedMarkdown"></div>
+                <div class="editor-preview h-[500px] overflow-y-auto prose-dark" v-html="renderedMarkdown"></div>
               </div>
             </div>
 
@@ -242,7 +243,7 @@
               </li>
               <li class="flex items-start gap-2 text-sm text-gray-400">
                 <span class="text-[#0e2e4f]">•</span>
-                <span>Lower access counts = higher security</span>
+                <span>Choose a view limit that fits your note</span>
               </li>
             </ul>
           </div>
@@ -637,30 +638,3 @@ onUnmounted(() => {
   }
 })
 </script>
-
-<style>
-.card {
-  background: rgba(17, 24, 39, 0.5);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-}
-
-.prose-dark {
-  color: #e5e7eb;
-}
-
-.prose-dark h1 { @apply text-2xl font-bold text-gray-100 mb-4 mt-6; }
-.prose-dark h2 { @apply text-xl font-bold text-gray-100 mb-3 mt-5; }
-.prose-dark h3 { @apply text-lg font-bold text-gray-100 mb-2 mt-4; }
-.prose-dark p { @apply text-gray-300 mb-4 leading-relaxed; }
-.prose-dark ul { @apply list-disc list-inside mb-4 text-gray-300; }
-.prose-dark ol { @apply list-decimal list-inside mb-4 text-gray-300; }
-.prose-dark li { @apply mb-1; }
-.prose-dark a { @apply text-[#0e2e4f] hover:text-[#1d6477] underline; }
-.prose-dark strong { @apply font-bold text-gray-100; }
-.prose-dark em { @apply italic; }
-.prose-dark code { @apply bg-gray-800 px-2 py-1 rounded font-mono text-sm text-gray-200; }
-.prose-dark pre { @apply bg-gray-800 p-4 rounded-lg overflow-x-auto mb-4; }
-.prose-dark blockquote { @apply border-l-4 border-[#0e2e4f] pl-4 italic text-gray-400 mb-4; }
-</style>
