@@ -1,6 +1,6 @@
 <template>
   <div class="auth-page min-h-[100dvh] bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full">
+    <div class="max-w-lg w-full">
       <div class="text-center mb-8">
         <NuxtLink to="/" class="flex items-center justify-center gap-3">
           <img src="~/assets/images/logo.png" alt="OneTimeView" class="h-10 w-auto" />

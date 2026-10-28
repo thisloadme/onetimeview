@@ -929,28 +929,29 @@ kbd {
 
 .auth-page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   min-height: 100dvh;
   place-items: center;
   padding: 2.5rem 1rem;
 }
 
 .auth-page > div {
-  width: min(100%, 440px);
+  width: min(100%, 480px);
 }
 
 .auth-page .card {
-  padding: clamp(1.25rem, 5vw, 2rem) !important;
+  padding: clamp(1.5rem, 5vw, 2rem) !important;
   color: var(--ink) !important;
   background: var(--sheet) !important;
   border: 1px solid var(--line) !important;
-  border-radius: 7px !important;
-  box-shadow: 0 2px 8px rgb(51 51 51 / 7%) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 2px 12px rgb(51 51 51 / 6%) !important;
   backdrop-filter: none !important;
 }
 
 .auth-page h2 {
   color: var(--ink) !important;
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 .auth-page p {
@@ -968,18 +969,36 @@ kbd {
   color: var(--ink) !important;
   background: var(--sheet) !important;
   border: 1px solid rgba(14, 42, 92, 0.48) !important;
-  border-radius: 5px !important;
+  border-radius: 0.5rem !important;
 }
 
 .auth-page .input-field:focus {
   border-color: var(--red) !important;
-  box-shadow: 0 0 0 2px rgb(209 40 40 / 18%) !important;
+  outline: 2px solid var(--red) !important;
+  outline-offset: 2px;
+  box-shadow: none !important;
 }
 
 .auth-page .btn-primary {
   color: #fffefa !important;
   background: var(--red) !important;
   border-color: var(--red) !important;
+  border-radius: 0.5rem !important;
+  transition: background-color 220ms ease, transform 220ms ease, box-shadow 220ms ease;
+}
+
+.auth-page .btn-primary:hover:not(:disabled) {
+  background: #c02525 !important;
+  box-shadow: 0 3px 8px rgb(51 51 51 / 14%) !important;
+}
+
+.auth-page .btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.auth-page .btn-primary:focus-visible {
+  outline: 2px solid var(--red) !important;
+  outline-offset: 2px;
 }
 
 .document-sheet-actions .document-delete-action {
