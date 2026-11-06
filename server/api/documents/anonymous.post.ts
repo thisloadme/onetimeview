@@ -1,5 +1,6 @@
 import { DocumentModel } from '~/server/models/Document'
 import { SharedLinkModel } from '~/server/models/SharedLink'
+import { hashOptionalPassphrase } from '~/server/utils/passphrase'
 import crypto from 'crypto'
 
 const MAX_TITLE_LENGTH = 200
@@ -7,7 +8,7 @@ const MAX_CONTENT_LENGTH = 50 * 1024 // 50KB
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { title, content, maxAccesses, expiresIn } = body
+  const { title, content, maxAccesses, expiresIn, passphrase } = body
 
   // Validate required fields
   if (!title || !title.trim()) {
@@ -39,19 +40,21 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (!maxAccesses || maxAccesses < 1 || maxAccesses > 100) {
+  if (!Number.isInteger(maxAccesses) || maxAccesses < 1 || maxAccesses > 100) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Max accesses must be between 1 and 100'
     })
   }
 
-  if (!expiresIn || expiresIn <= 0) {
+  if (!Number.isInteger(expiresIn) || expiresIn <= 0 || expiresIn > 720) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Expiration time is required'
+      statusMessage: 'Expiration must be between 1 hour and 30 days'
     })
   }
+
+  const passphraseHash = await hashOptionalPassphrase(passphrase)
 
   // Create document with author_id set to NULL (anonymous)
   const document = await DocumentModel.create({
@@ -75,7 +78,8 @@ export default defineEventHandler(async (event) => {
     max_accesses: maxAccesses,
     current_accesses: 0,
     is_active: true,
-    expires_at: expiresAt
+    expires_at: expiresAt,
+    passphrase_hash: passphraseHash
   })
 
   // Construct the full URL
@@ -91,6 +95,7 @@ export default defineEventHandler(async (event) => {
     },
     sharedLink: {
       token,
+      requiresPassphrase: Boolean(passphraseHash),
       maxAccesses,
       currentAccesses: 0,
       remainingAccesses: maxAccesses,

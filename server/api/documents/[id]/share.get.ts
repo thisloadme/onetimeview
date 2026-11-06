@@ -47,6 +47,7 @@ export default defineEventHandler(async (event) => {
       maxAccesses: link.max_accesses,
       currentAccesses: link.current_accesses,
       expiresAt: link.expires_at,
+      requiresPassphrase: Boolean(link.passphrase_hash),
       url: `/view/${link.token}`
     }))
   }

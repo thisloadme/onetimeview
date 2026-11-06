@@ -7,6 +7,31 @@
         <p class="text-gray-400">Secure document sharing</p>
       </div>
 
+      <form
+        v-if="requiresPassphrase && !document"
+        @submit.prevent="submitPassphrase"
+        class="card p-6 mb-6"
+      >
+        <h2 class="text-xl font-semibold text-gray-100 mb-2">Passphrase required</h2>
+        <p class="text-sm text-gray-400 mb-5">Enter the passphrase shared with you to open this document.</p>
+        <label for="view-passphrase" class="block text-sm font-medium text-gray-300 mb-2">Passphrase</label>
+        <input
+          id="view-passphrase"
+          v-model="passphrase"
+          type="password"
+          required
+          minlength="8"
+          maxlength="128"
+          autocomplete="current-password"
+          class="input-field w-full min-h-11"
+          :disabled="loading"
+        />
+        <p v-if="passphraseError" role="alert" class="mt-3 text-sm text-red-300">{{ passphraseError }}</p>
+        <button type="submit" :disabled="loading || !passphrase" class="btn-primary mt-5 min-h-11 disabled:opacity-50">
+          {{ loading ? 'Checking...' : 'Open document' }}
+        </button>
+      </form>
+
       <!-- ⚠️ P2.7: Restore AccessInfo Display -->
       <div v-if="accessInfo" class="card p-4 mb-6">
         <div class="flex items-center justify-between flex-wrap gap-3">
@@ -48,7 +73,7 @@
       </div>
 
       <!-- Loading State -->
-      <div v-else class="text-center py-16">
+      <div v-else-if="loading && !requiresPassphrase" class="text-center py-16">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
         <p class="text-gray-400">Loading document...</p>
       </div>
@@ -70,17 +95,53 @@ const token = route.params.token
 const document = ref(null)
 const accessInfo = ref(null)
 const error = ref('')
+const loading = ref(true)
+const requiresPassphrase = ref(false)
+const passphrase = ref('')
+const passphraseError = ref('')
 
 const renderedContent = computed(() => {
   if (!document.value?.content) return ''
   return marked(document.value.content)
 })
 
+const submitPassphrase = async () => {
+  loading.value = true
+  passphraseError.value = ''
+
+  try {
+    const response = await $fetch(`/api/view/${token}`, {
+      method: 'POST',
+      body: { passphrase: passphrase.value }
+    })
+    document.value = response.document
+    accessInfo.value = response.accessInfo
+    requiresPassphrase.value = false
+    passphrase.value = ''
+  } catch (err) {
+    const status = err.statusCode || err.status || err.data?.statusCode
+    if (status === 401) {
+      passphraseError.value = 'The passphrase is incorrect.'
+    } else if (status === 429) {
+      passphraseError.value = err.data?.statusMessage || 'Too many attempts. Try again later.'
+    } else {
+      requiresPassphrase.value = false
+      error.value = 'This link is no longer available.'
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(async () => {
   try {
     const response = await $fetch(`/api/view/${token}`)
-    document.value = response.document
-    accessInfo.value = response.accessInfo
+    if (response.requiresPassphrase) {
+      requiresPassphrase.value = true
+    } else {
+      document.value = response.document
+      accessInfo.value = response.accessInfo
+    }
   } catch (err) {
     if (err.statusCode === 404 || err.status === 404) {
       error.value = 'Document not found'
@@ -89,6 +150,8 @@ onMounted(async () => {
     } else {
       error.value = 'Unable to load document'
     }
+  } finally {
+    loading.value = false
   }
 })
 

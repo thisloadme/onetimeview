@@ -1,6 +1,7 @@
 import { DocumentModel } from '~/server/models/Document'
 import { SharedLinkModel } from '~/server/models/SharedLink'
 import { getCurrentUser } from '~/server/utils/auth'
+import { hashOptionalPassphrase } from '~/server/utils/passphrase'
 import crypto from 'crypto'
 
 export default defineEventHandler(async (event) => {
@@ -14,12 +15,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const documentId = getRouterParam(event, 'id')
-  const { maxAccesses, expiresIn } = await readBody(event)
+  const { maxAccesses, expiresIn, passphrase } = await readBody(event)
 
-  if (!maxAccesses || !expiresIn) {
+  if (!Number.isInteger(maxAccesses) || maxAccesses < 1 || maxAccesses > 1000 ||
+      !Number.isInteger(expiresIn) || expiresIn < 1 || expiresIn > 720) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Maximum accesses and expiration time are required'
+      statusMessage: 'Choose 1 to 1000 views and an expiration between 1 hour and 30 days'
     })
   }
 
@@ -45,13 +47,15 @@ export default defineEventHandler(async (event) => {
   // Calculate expiration date
   const expiresAt = new Date()
   expiresAt.setTime(expiresAt.getTime() + (expiresIn * 60 * 60 * 1000))
+  const passphraseHash = await hashOptionalPassphrase(passphrase)
 
   // Create shared link
   const sharedLink = await SharedLinkModel.create({
     document_id: parseInt(documentId),
     token,
     max_accesses: maxAccesses,
-    expires_at: expiresAt
+    expires_at: expiresAt,
+    passphrase_hash: passphraseHash
   })
 
   // Mark document as published
@@ -60,6 +64,7 @@ export default defineEventHandler(async (event) => {
   return {
     sharedLink: {
       token,
+      requiresPassphrase: Boolean(passphraseHash),
       maxAccesses,
       currentAccesses: 0,
       expiresAt,

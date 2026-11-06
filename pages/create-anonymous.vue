@@ -3,29 +3,29 @@
     <!-- Navigation -->
     <nav class="bg-gray-950 border-b border-gray-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-          <div class="flex items-center space-x-4">
-            <NuxtLink to="/" class="flex items-center gap-3">
+        <div class="flex flex-wrap justify-between items-center gap-y-2 min-h-20 py-2">
+          <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
+            <NuxtLink to="/" class="flex items-center gap-2 sm:gap-3">
               <img src="~/assets/images/logo.png" alt="OneTimeView" class="h-8 w-auto" />
-              <span class="text-3xl font-bold text-gradient">OneTimeView</span>
+              <span class="text-2xl sm:text-3xl font-bold text-gradient">OneTimeView</span>
             </NuxtLink>
-            <span class="text-gray-600">/</span>
-            <span class="text-gray-300">Quick Create</span>
+            <span class="hidden sm:inline text-gray-600">/</span>
+            <span class="hidden sm:inline text-gray-300">Quick Create</span>
           </div>
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center gap-2 sm:gap-4">
             <template v-if="user">
-              <NuxtLink to="/dashboard" class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
+              <NuxtLink to="/dashboard" class="px-2 sm:px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
                 Dashboard
               </NuxtLink>
-              <NuxtLink to="/create" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
+              <NuxtLink to="/create" class="px-3 sm:px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
                 Create Document
               </NuxtLink>
             </template>
             <template v-else>
-              <NuxtLink to="/login" class="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
+              <NuxtLink to="/login" class="px-2 sm:px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all">
                 Login
               </NuxtLink>
-              <NuxtLink to="/register" class="px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
+              <NuxtLink to="/register" class="px-3 sm:px-6 py-2 bg-white text-[#0e2e4f] font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105">
                 Sign Up
               </NuxtLink>
             </template>
@@ -167,6 +167,21 @@
               Sharing Settings
             </h3>
 
+            <div class="mb-6 space-y-2" role="group" aria-label="Quick sharing presets">
+              <p class="block text-sm font-medium text-gray-300">Quick presets</p>
+              <button
+                v-for="preset in sharePresets"
+                :key="preset.id"
+                type="button"
+                :aria-pressed="isPresetSelected(preset)"
+                @click="applyPreset(preset)"
+                :class="isPresetSelected(preset) ? 'border-[#1d6477] bg-[#0e2e4f]/30 text-white' : 'border-gray-700 bg-gray-900/40 text-gray-300 hover:border-gray-500'"
+                class="w-full min-h-11 rounded-lg border px-3 py-2 text-left text-sm transition-colors"
+              >
+                {{ preset.label }}
+              </button>
+            </div>
+
             <!-- Max Accesses -->
             <div class="mb-6">
               <label class="block text-sm font-medium text-gray-300 mb-2">
@@ -194,7 +209,7 @@
               </label>
               <select
                 v-model="settings.expiresIn"
-                class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0e2e4f]"
+                class="w-full min-h-11 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0e2e4f]"
               >
                 <option :value="1">1 Hour</option>
                 <option :value="6">6 Hours</option>
@@ -203,6 +218,23 @@
                 <option :value="24 * 30">30 Days</option>
               </select>
               <p class="text-xs text-gray-500 mt-2">The link will expire after this period</p>
+            </div>
+
+            <div class="mb-6">
+              <label for="anonymous-passphrase" class="block text-sm font-medium text-gray-300 mb-2">
+                Passphrase (optional)
+              </label>
+              <input
+                id="anonymous-passphrase"
+                v-model.trim="settings.passphrase"
+                type="password"
+                minlength="8"
+                maxlength="128"
+                autocomplete="new-password"
+                class="w-full min-h-11 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0e2e4f]"
+                placeholder="At least 8 characters"
+              />
+              <p class="text-xs text-gray-400 mt-2">Share it separately from the link. Use 8 to 128 characters.</p>
             </div>
 
             <!-- Info Box -->
@@ -287,13 +319,13 @@
         <!-- Share Link -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-300 mb-2">Share Link</label>
-          <div class="flex gap-2">
+          <div class="flex flex-col sm:flex-row gap-2">
             <input
               ref="shareLinkInput"
               type="text"
               :value="shareLink"
               readonly
-              class="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 text-sm"
+              class="min-w-0 flex-1 min-h-11 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 text-sm"
             />
             <button
               @click="copyLink"
@@ -308,6 +340,27 @@
               {{ copied ? 'Copied!' : 'Copy' }}
             </button>
           </div>
+        </div>
+
+        <div v-if="createdDocument?.requiresPassphrase" class="mb-6 p-4 bg-[#0e2e4f]/20 border border-[#0e2e4f]/50 rounded-lg">
+          <p class="text-sm text-gray-200 font-medium mb-2">This link requires a passphrase.</p>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input
+              type="password"
+              :value="settings.passphrase"
+              readonly
+              aria-label="Passphrase used for this link"
+              class="min-w-0 flex-1 min-h-11 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 text-sm"
+            />
+            <button
+              type="button"
+              @click="copyPassphrase"
+              class="min-h-11 px-4 py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              {{ passphraseCopied ? 'Copied' : 'Copy passphrase' }}
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">Send it through a separate channel. It is not included in the link.</p>
         </div>
 
         <!-- Document Info -->
@@ -351,6 +404,7 @@
 
 <script setup>
 import { marked } from 'marked'
+import { SHARE_PRESETS } from '~/utils/sharePresets'
 
 const anonymousDocument = reactive({
   title: '',
@@ -361,14 +415,17 @@ const user = ref(null)
 
 const settings = reactive({
   maxAccesses: 5,
-  expiresIn: 24
+  expiresIn: 24,
+  passphrase: ''
 })
 
 const creating = ref(false)
 const showSuccessModal = ref(false)
 const shareLink = ref('')
 const copied = ref(false)
+const passphraseCopied = ref(false)
 const createdDocument = ref(null)
+const sharePresets = SHARE_PRESETS
 
 const textareaRef = ref(null)
 const showSlashMenu = ref(false)
@@ -396,8 +453,18 @@ console.log('Hello World!');
 \`\`\``
 
 const isValid = computed(() => {
-  return anonymousDocument.title.trim() && anonymousDocument.content.trim()
+  const passphrase = settings.passphrase.trim()
+  return anonymousDocument.title.trim() && anonymousDocument.content.trim() &&
+    (!passphrase || (passphrase.length >= 8 && passphrase.length <= 128))
 })
+
+const isPresetSelected = (preset) =>
+  settings.maxAccesses === preset.maxAccesses && settings.expiresIn === preset.expiresIn
+
+const applyPreset = (preset) => {
+  settings.maxAccesses = preset.maxAccesses
+  settings.expiresIn = preset.expiresIn
+}
 
 const renderedMarkdown = computed(() => {
   if (!anonymousDocument.content) return '<p class="text-gray-500">Preview will be shown here...</p>'
@@ -568,14 +635,16 @@ const createDocument = async () => {
         title: anonymousDocument.title,
         content: anonymousDocument.content,
         maxAccesses: settings.maxAccesses,
-        expiresIn: settings.expiresIn
+        expiresIn: settings.expiresIn,
+        passphrase: settings.passphrase
       }
     })
 
     shareLink.value = result.sharedLink.url
     createdDocument.value = {
       ...result.sharedLink,
-      expiresIn: settings.expiresIn
+      expiresIn: settings.expiresIn,
+      requiresPassphrase: result.sharedLink.requiresPassphrase
     }
     showSuccessModal.value = true
   } catch (error) {
@@ -597,13 +666,27 @@ const copyLink = async () => {
   }
 }
 
+const copyPassphrase = async () => {
+  try {
+    await navigator.clipboard.writeText(settings.passphrase)
+    passphraseCopied.value = true
+    setTimeout(() => {
+      passphraseCopied.value = false
+    }, 2000)
+  } catch (err) {
+    alert('Failed to copy passphrase')
+  }
+}
+
 const closeSuccessModal = () => {
   showSuccessModal.value = false
   shareLink.value = ''
   copied.value = false
+  passphraseCopied.value = false
   createdDocument.value = null
   anonymousDocument.title = ''
   anonymousDocument.content = ''
+  settings.passphrase = ''
 }
 
 const formatExpiration = (hours) => {

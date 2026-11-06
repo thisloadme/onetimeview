@@ -4,6 +4,7 @@ import prisma from '../utils/prisma'
 export interface CreateSharedLinkData {
   document_id: number
   token?: string
+  passphrase_hash?: string | null
   max_accesses: number
   expires_at: Date
   current_accesses?: number
@@ -16,6 +17,7 @@ export class SharedLinkModel {
       data: {
         document_id: linkData.document_id,
         token: linkData.token || crypto.randomBytes(32).toString('hex'),
+        passphrase_hash: linkData.passphrase_hash ?? null,
         max_accesses: linkData.max_accesses,
         current_accesses: linkData.current_accesses ?? 0,
         is_active: linkData.is_active ?? true,
@@ -41,32 +43,25 @@ export class SharedLinkModel {
     return links
   }
 
-  static async incrementAccess(id: number) {
-    try {
-      const link = await prisma.sharedLink.update({
-        where: { id },
-        data: {
-          current_accesses: { increment: 1 }
-        }
-      })
-      return link
-    } catch (e: any) {
-      if (e.code === 'P2025') return null
-      throw e
-    }
+  static async deactivateForDocument(id: number, documentId: number) {
+    const result = await prisma.sharedLink.updateMany({
+      where: { id, document_id: documentId, is_active: true },
+      data: { is_active: false }
+    })
+    return result.count > 0
   }
 
-  static async deactivate(id: number) {
-    try {
-      const link = await prisma.sharedLink.update({
-        where: { id },
-        data: { is_active: false }
-      })
-      return link
-    } catch (e: any) {
-      if (e.code === 'P2025') return null
-      throw e
-    }
+  static async incrementAccessIfAvailable(id: number, maxAccesses: number) {
+    const result = await prisma.sharedLink.updateMany({
+      where: {
+        id,
+        is_active: true,
+        current_accesses: { lt: maxAccesses },
+        expires_at: { gt: new Date() }
+      },
+      data: { current_accesses: { increment: 1 } }
+    })
+    return result.count > 0
   }
 
   static async findActiveByToken(token: string) {
@@ -107,6 +102,18 @@ export class SharedLinkModel {
       `DELETE FROM "SharedLink" WHERE current_accesses >= max_accesses AND is_active = true`
     )
     totalRemoved += exhaustedResult
+
+    await prisma.sharedLinkPassphraseAttempt.deleteMany({
+      where: {
+        OR: [
+          {
+            window_started_at: { lt: new Date(now.getTime() - 5 * 60 * 1000) },
+            in_flight_attempts: 0
+          },
+          { updated_at: { lt: new Date(now.getTime() - 30 * 60 * 1000) } }
+        ]
+      }
+    })
 
     return totalRemoved
   }
