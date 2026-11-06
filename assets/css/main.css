@@ -110,6 +110,24 @@ textarea,
   background-color: #e2dacb !important;
 }
 
+/* Keep legacy Tailwind hover utilities on the same light surfaces as their base utilities. */
+[class~='hover:bg-gray-950']:hover,
+[class~='hover:bg-gray-900']:hover {
+  background-color: var(--paper) !important;
+}
+
+[class~='hover:bg-gray-800']:hover {
+  background-color: var(--sheet) !important;
+}
+
+[class~='hover:bg-gray-700']:hover {
+  background-color: var(--paper-deep) !important;
+}
+
+[class~='hover:bg-gray-600']:hover {
+  background-color: #e2dacb !important;
+}
+
 [class*='bg-gray-950/'],
 [class*='bg-gray-900/'],
 [class*='bg-gray-800/'],
