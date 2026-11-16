@@ -118,7 +118,7 @@
                 <div class="editor-pane-heading">
                   <h3 class="font-medium text-gray-100">Live preview</h3>
                 </div>
-                <div class="editor-preview h-[500px] overflow-y-auto prose-dark" v-html="renderedMarkdown"></div>
+                <div class="editor-preview h-[500px] overflow-y-auto prose prose-dark max-w-none" v-html="renderedMarkdown"></div>
               </div>
             </div>
 

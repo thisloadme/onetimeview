@@ -67,7 +67,7 @@
           <h2 id="preview-heading">Live preview</h2>
           <span class="text-sm text-gray-500">What readers will see</span>
         </div>
-        <div class="editor-preview prose-dark" v-html="renderedMarkdown"></div>
+        <div class="editor-preview prose prose-dark max-w-none" v-html="renderedMarkdown"></div>
       </section>
     </div>
   </section>

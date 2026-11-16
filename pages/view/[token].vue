@@ -58,7 +58,7 @@
       <div v-if="document" class="card overflow-hidden">
         <div class="p-8">
           <h1 class="text-3xl font-bold text-gray-100 mb-6">{{ document.title }}</h1>
-          <div class="prose-dark" v-html="renderedContent"></div>
+          <div class="prose prose-dark max-w-none" v-html="renderedContent"></div>
         </div>
       </div>
 
